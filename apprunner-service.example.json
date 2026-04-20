@@ -1,0 +1,33 @@
+{
+  "ServiceName": "your-service-name",
+  "SourceConfiguration": {
+    "AuthenticationConfiguration": {
+      "AccessRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/AppRunnerECRAccessRole"
+    },
+    "AutoDeploymentsEnabled": false,
+    "ImageRepository": {
+      "ImageIdentifier": "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com/your-ecr-repo:tag",
+      "ImageRepositoryType": "ECR",
+      "ImageConfiguration": {
+        "Port": "8000",
+        "RuntimeEnvironmentSecrets": {
+          "ANTHROPIC_API_KEY": "arn:aws:secretsmanager:YOUR_REGION:YOUR_AWS_ACCOUNT_ID:secret:your-secret-name",
+          "OPENAI_API_KEY": "arn:aws:secretsmanager:YOUR_REGION:YOUR_AWS_ACCOUNT_ID:secret:your-secret-name"
+        }
+      }
+    }
+  },
+  "InstanceConfiguration": {
+    "Cpu": "256",
+    "Memory": "512",
+    "InstanceRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/AppRunnerInstanceRole"
+  },
+  "HealthCheckConfiguration": {
+    "Protocol": "HTTP",
+    "Path": "/health",
+    "Interval": 10,
+    "Timeout": 5,
+    "HealthyThreshold": 1,
+    "UnhealthyThreshold": 5
+  }
+}

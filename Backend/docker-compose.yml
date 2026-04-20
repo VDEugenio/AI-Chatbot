@@ -1,0 +1,29 @@
+# Local-development convenience for the Vaughn RAG backend.
+#
+# The build context is the parent directory (the repo root) so the Dockerfile
+# can COPY both Backend/ and Pipeline/chroma_db. Run from inside Backend/:
+#
+#   docker compose up --build
+#
+# Reads secrets from Backend/.env (copy from .env.example and fill in keys).
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Backend/Dockerfile
+    image: vaughn-rag-backend:local
+    container_name: vaughn-rag-backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      PORT: "8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s

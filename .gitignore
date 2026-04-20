@@ -1,0 +1,9 @@
+# Sensitive deployment config — copy to apprunner-service.json and fill in your values
+apprunner-service.json
+
+# Claude Code local settings
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

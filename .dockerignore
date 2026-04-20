@@ -1,0 +1,45 @@
+# Lives at the repo root because the Docker build context is the repo root
+# (see Backend/Dockerfile header). Docker only reads .dockerignore from the
+# context root, so placing this file under Backend/ would have no effect.
+
+# Python bytecode / caches
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+
+# Virtual environments
+**/.venv
+**/venv
+Backend/.venv
+Pipeline/.venv
+
+# Secrets — must never enter the image
+**/.env
+**/.env.local
+**/.env.*.local
+
+# VCS / editor / OS noise
+**/.git
+**/.gitignore
+**/.gitattributes
+**/.idea
+**/.vscode
+**/.DS_Store
+**/Thumbs.db
+
+# Documentation — keep Backend README out of the image; it's not needed at runtime
+**/*.md
+
+# Pipeline artifacts that should NOT be baked into the image:
+#   - data/ holds the raw source documents (potentially sensitive, not used at runtime)
+#   - chunks_metadata.json is a debug export from ingest.py
+# Note: Pipeline/chroma_db/ is intentionally NOT ignored — it's the vector store.
+Pipeline/data
+Pipeline/chunks_metadata.json
+Pipeline/__pycache__
+
+# Plan/test scratch
+**/*.log
