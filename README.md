@@ -43,10 +43,7 @@ A FastAPI service that handles each chat turn:
 1. **Query expansion** — maps natural language to technical vocabulary (e.g., "efficient" expands to "optimized performance streamlined reduced latency") to bridge vocabulary mismatches between a user's words and document language
 2. **History merging** — folds recent user turns into the query so follow-ups like "tell me more" stay on-topic
 3. **Metadata pre-filtering** — detects company names in the query and restricts ChromaDB search to that company's chunks
-4. **Retrieval** — three modes available:
-   - **Vector-only** (default): semantic similarity search via OpenAI embeddings + ChromaDB
-   - **BM25-only**: exact keyword matching via `rank_bm25` — great for proper nouns
-   - **Hybrid RRF** (recommended): runs both, fuses results with Reciprocal Rank Fusion — no extra LLM call needed
+4. **Retrieval** — uses Hybrid RRF (Reciprocal Rank Fusion): runs semantic vector search and BM25 keyword search in parallel, then fuses the two ranked lists. Chunks that rank highly in both float to the top. This catches questions phrased semantically ("what did you build that scaled well?") and exact proper-noun lookups ("DraftKings", "TrackSync") in a single pass with no extra LLM call
 5. **Prompt construction** — retrieved chunks are inlined with `[source: filename#chunk_id]` tags
 6. **Answer generation** — Claude reads the evidence and generates a grounded, cited response
 7. **Source return** — the API response includes the source chunks with scores and previews so clients can show citations

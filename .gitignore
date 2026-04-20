@@ -7,3 +7,4 @@ apprunner-service.json
 # OS
 .DS_Store
 Thumbs.db
+test_results.txt
