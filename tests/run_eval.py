@@ -123,7 +123,9 @@ def evaluate_question(q, api_url):
 
 def run_eval(questions, api_url):
     results = []
-    for q in questions:
+    for i, q in enumerate(questions):
+        if i > 0:
+            time.sleep(1)  # brief pause to avoid overwhelming the backend
         print(f"  Running {q['id']}...", end="", flush=True)
         r = evaluate_question(q, api_url)
         status = "PASS" if r["passed"] else ("ERROR" if r["error"] else "FAIL")
