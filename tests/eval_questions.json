@@ -1,0 +1,222 @@
+[
+  {
+    "id": "Q01",
+    "question": "Tell me about a time you improved system performance or efficiency",
+    "topic": "efficiency",
+    "expected_keywords": ["350K", "tracks", "trie", "parallelized", "optimized"],
+    "min_keywords_required": 2,
+    "expected_sources": ["src_tracksync_optimizations.md"],
+    "min_sources_required": 1,
+    "notes": "Should surface TrackSync's trie-based ID validation and parallelized translation pipeline at SRC"
+  },
+  {
+    "id": "Q02",
+    "question": "How do you handle production incidents under pressure?",
+    "topic": "efficiency",
+    "expected_keywords": ["mitigation", "incident", "on-call", "root cause"],
+    "min_keywords_required": 2,
+    "expected_sources": ["draftkings_incident_response.md", "draftkings_practices_collaboration.md"],
+    "min_sources_required": 1,
+    "notes": "Should reference DraftKings on-call rotation and the critical validation bug resolution"
+  },
+  {
+    "id": "Q03",
+    "question": "What's the most technically challenging optimization you've worked on?",
+    "topic": "efficiency",
+    "expected_keywords": ["deep sleep", "power", "battery", "ESP32"],
+    "min_keywords_required": 2,
+    "expected_sources": ["smartlock_dev_and_challenges.md", "smartlock_technical_deepdive.md"],
+    "min_sources_required": 1,
+    "notes": "Should reference VaughnKey power optimization: deep sleep at ~10µA, modified power bank bypass"
+  },
+  {
+    "id": "Q04",
+    "question": "How did you scale a system to handle high traffic?",
+    "topic": "efficiency",
+    "expected_keywords": ["500k", "Redis", "Kubernetes", "caching"],
+    "min_keywords_required": 2,
+    "expected_sources": ["draftkings_performance_scale.md", "draftkings_role_and_stack.md"],
+    "min_sources_required": 1,
+    "notes": "Should surface DraftKings 500k+ peak daily users, Redis caching, K8s scaling"
+  },
+  {
+    "id": "Q05",
+    "question": "What distributed systems technologies have you worked with?",
+    "topic": "technical",
+    "expected_keywords": ["Orleans", "RabbitMQ", "Redis", "Kubernetes", "microservices"],
+    "min_keywords_required": 3,
+    "expected_sources": ["draftkings_role_and_stack.md", "draftkings_architecture.md"],
+    "min_sources_required": 1,
+    "notes": "Should cover DraftKings: Microsoft Orleans (Virtual Actor Model), RabbitMQ, Redis, K8s, 15+ microservices"
+  },
+  {
+    "id": "Q06",
+    "question": "Describe your experience with embedded systems or IoT",
+    "topic": "technical",
+    "expected_keywords": ["ESP32", "BLE", "firmware", "servo", "capacitive"],
+    "min_keywords_required": 3,
+    "expected_sources": ["smartlock_overview.md", "smartlock_hardware.md"],
+    "min_sources_required": 1,
+    "notes": "Should cover VaughnKey: ESP32, BLE proximity auth, servo actuation, capacitive touch sensing"
+  },
+  {
+    "id": "Q07",
+    "question": "What AI or machine learning technologies have you used?",
+    "topic": "technical",
+    "expected_keywords": ["Claude", "RAG", "ChromaDB", "embeddings", "Haiku", "LLM"],
+    "min_keywords_required": 3,
+    "expected_sources": ["chatbot_overview.md", "job_tracker_overview.md"],
+    "min_sources_required": 1,
+    "notes": "Should cover the RAG chatbot (ChromaDB, embeddings, hybrid retrieval) and job tracker (Claude Haiku classification)"
+  },
+  {
+    "id": "Q08",
+    "question": "What programming languages and frameworks are you strongest in?",
+    "topic": "technical",
+    "expected_keywords": ["C#", "Java", "Python", "React", "FastAPI", ".NET", "Spring Boot"],
+    "min_keywords_required": 3,
+    "expected_sources": ["technical_skills.md", "draftkings_role_and_stack.md"],
+    "min_sources_required": 1,
+    "notes": "Should pull from technical_skills.md overview plus role-specific stack files"
+  },
+  {
+    "id": "Q09",
+    "question": "Tell me about your most impressive personal project",
+    "topic": "projects",
+    "expected_keywords": ["VaughnKey", "smartlock", "ESP32", "chatbot", "RAG"],
+    "min_keywords_required": 2,
+    "expected_sources": ["smartlock_overview.md", "chatbot_overview.md"],
+    "min_sources_required": 1,
+    "notes": "Should mention both VaughnKey smart lock and the AI resume chatbot as personal projects"
+  },
+  {
+    "id": "Q11",
+    "question": "Describe a project where you had to make difficult technical trade-offs",
+    "topic": "projects",
+    "expected_keywords": ["BLE", "WiFi", "RAG", "fine-tuning", "BM25", "vector"],
+    "min_keywords_required": 2,
+    "expected_sources": ["chatbot_challenges_decisions.md", "smartlock_dev_and_challenges.md"],
+    "min_sources_required": 1,
+    "notes": "Chatbot: RAG vs fine-tune, BM25+vector vs vector-only. SmartLock: WiFi→BLE, servo selection, touch detection approach"
+  },
+  {
+    "id": "Q12",
+    "question": "Tell me about the job tracker you built",
+    "topic": "projects",
+    "expected_keywords": ["Gmail", "OAuth", "Haiku", "email", "classification", "SQLite"],
+    "min_keywords_required": 3,
+    "expected_sources": ["job_tracker_overview.md"],
+    "min_sources_required": 1,
+    "notes": "Specific enough to target job tracker rather than smartlock. Should surface Gmail OAuth, Claude Haiku classification, SQLite"
+  },
+  {
+    "id": "Q13",
+    "question": "Tell me about a time you worked with non-technical stakeholders",
+    "topic": "collaboration",
+    "expected_keywords": ["COP", "stakeholder", "Solutions Engineering", "customer", "alignment"],
+    "min_keywords_required": 2,
+    "expected_sources": ["src_cop_is_king.md", "src_customer_engagement_onboarding.md"],
+    "min_sources_required": 1,
+    "notes": "Should surface SRC's 'COP is King' decision framework and customer engagement/sprint demo stories"
+  },
+  {
+    "id": "Q14",
+    "question": "Describe a cross-functional project you led or contributed to",
+    "topic": "collaboration",
+    "expected_keywords": ["Ohtani", "cross-functional", "product", "data team", "pitcher", "hitter"],
+    "min_keywords_required": 2,
+    "expected_sources": ["draftkings_ohtani_project.md", "draftkings_practices_collaboration.md"],
+    "min_sources_required": 1,
+    "notes": "Should surface the Shohei Ohtani dual-role edge case project at DraftKings"
+  },
+  {
+    "id": "Q15",
+    "question": "How do you explain technical concepts to non-engineers?",
+    "topic": "collaboration",
+    "expected_keywords": ["demo", "customer", "onboarding", "sprint", "presentation"],
+    "min_keywords_required": 2,
+    "expected_sources": ["src_customer_engagement_onboarding.md", "src_cop_is_king.md"],
+    "min_sources_required": 1,
+    "notes": "May draw from SRC sprint demos, customer on-site visits, and the COP is King stakeholder alignment story"
+  },
+  {
+    "id": "Q16",
+    "question": "Why are you interested in Solutions Engineering roles?",
+    "topic": "career",
+    "expected_keywords": ["technical liaison", "customer", "collaboration", "cross-functional"],
+    "min_keywords_required": 2,
+    "expected_sources": ["profile_overview.md", "src_cop_is_king.md"],
+    "min_sources_required": 1,
+    "notes": "Should draw from profile overview career goals and SRC Solutions Engineering narrative"
+  },
+  {
+    "id": "Q17",
+    "question": "What's your experience working in defense or government contracts?",
+    "topic": "career",
+    "expected_keywords": ["Secret clearance", "SRC", "TAK", "COP", "military", "defense"],
+    "min_keywords_required": 3,
+    "expected_sources": ["src_role_overview.md", "src_tracksync_architecture.md"],
+    "min_sources_required": 1,
+    "notes": "Should reference Secret clearance, TrackSync military system (TAK↔COP), SRC Inc. defense context"
+  },
+  {
+    "id": "Q18",
+    "question": "Tell me about your time at DraftKings",
+    "topic": "career",
+    "expected_keywords": ["DraftKings", "DFS", "daily fantasy", "C#", "Orleans", "500k"],
+    "min_keywords_required": 3,
+    "expected_sources": ["draftkings_role_and_stack.md"],
+    "min_sources_required": 1,
+    "notes": "Broad overview question — should pull from role overview and mention stack, scale, and team context"
+  },
+  {
+    "id": "Q19",
+    "question": "What is Vaughn's professional background?",
+    "topic": "ui_chip",
+    "expected_keywords": ["distributed systems", "Solutions Engineering", "DraftKings", "SRC"],
+    "min_keywords_required": 2,
+    "expected_sources": ["profile_overview.md"],
+    "min_sources_required": 1,
+    "notes": "Exact UI chip — high priority. Should give a broad career summary touching all major roles"
+  },
+  {
+    "id": "Q20",
+    "question": "What did Vaughn work on at DraftKings?",
+    "topic": "ui_chip",
+    "expected_keywords": ["C#", "Orleans", "DFS", "microservices", "RabbitMQ", "500k"],
+    "min_keywords_required": 3,
+    "expected_sources": ["draftkings_role_and_stack.md", "draftkings_architecture.md"],
+    "min_sources_required": 1,
+    "notes": "Exact UI chip — should detail DFS backend, tech stack, and scale"
+  },
+  {
+    "id": "Q21",
+    "question": "Tell me about Vaughn's experience at SRC Inc.",
+    "topic": "ui_chip",
+    "expected_keywords": ["TrackSync", "TAK", "COP", "Java", "Spring Boot", "Secret clearance"],
+    "min_keywords_required": 3,
+    "expected_sources": ["src_role_overview.md", "src_tracksync_architecture.md"],
+    "min_sources_required": 1,
+    "notes": "Exact UI chip — should cover TrackSync, military domain, Java/Spring Boot stack, clearance"
+  },
+  {
+    "id": "Q22",
+    "question": "What are some of Vaughn's personal projects?",
+    "topic": "ui_chip",
+    "expected_keywords": ["VaughnKey", "smartlock", "chatbot", "job tracker", "RAG"],
+    "min_keywords_required": 3,
+    "expected_sources": ["smartlock_overview.md", "chatbot_overview.md", "job_tracker_overview.md"],
+    "min_sources_required": 2,
+    "notes": "Exact UI chip — should mention all three: VaughnKey, AI chatbot, and job tracker"
+  },
+  {
+    "id": "Q23",
+    "question": "Would Vaughn be a good fit for a Solutions Engineering role?",
+    "topic": "ui_chip",
+    "expected_keywords": ["customer", "technical liaison", "cross-functional", "collaboration", "stakeholder"],
+    "min_keywords_required": 2,
+    "expected_sources": ["profile_overview.md", "src_cop_is_king.md"],
+    "min_sources_required": 1,
+    "notes": "Exact UI chip — should make a positive case referencing customer-facing work, SE narrative from SRC, and collaborative pattern across roles"
+  }
+]

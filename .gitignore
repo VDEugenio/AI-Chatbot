@@ -8,3 +8,6 @@ apprunner-service.json
 .DS_Store
 Thumbs.db
 test_results.txt
+
+# Eval run results (keep baseline.json if you want to commit it)
+tests/results/run_*.json
