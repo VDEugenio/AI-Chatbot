@@ -1,0 +1,80 @@
+name: RAG Eval
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run evaluation
+        env:
+          CHAT_API_URL: ${{ secrets.CHAT_API_URL }}
+        run: |
+          python tests/run_eval.py \
+            --api-url "${CHAT_API_URL:-https://chat.vaughneugenio.com}" \
+            --output tests/results/ci_run.json
+
+      - name: Upload results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results-${{ github.sha }}
+          path: tests/results/ci_run.json
+
+      - name: Post PR comment
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body = '## RAG Eval Results\n\n';
+            try {
+              const data = JSON.parse(fs.readFileSync('tests/results/ci_run.json', 'utf8'));
+              const s = data.summary;
+              const pct = (s.accuracy * 100).toFixed(1);
+              const status = s.accuracy >= 0.80 ? '✅' : '❌';
+              body += `${status} **${s.passed}/${s.total} passed (${pct}%)** — avg ${s.avg_response_ms}ms\n\n`;
+              body += '| Topic | Passed | Total | % |\n|-------|--------|-------|---|\n';
+              for (const [topic, counts] of Object.entries(s.by_topic)) {
+                const tpct = (counts.passed / counts.total * 100).toFixed(0);
+                body += `| ${topic} | ${counts.passed} | ${counts.total} | ${tpct}% |\n`;
+              }
+              const failed = data.questions.filter(q => !q.passed);
+              if (failed.length > 0) {
+                body += '\n**Failed questions:**\n';
+                for (const q of failed) {
+                  body += `- \`${q.id}\` (${q.topic}): `;
+                  if (q.error) {
+                    body += `Error: ${q.error}`;
+                  } else {
+                    if (q.keyword_check?.missing?.length) body += `missing keywords: ${q.keyword_check.missing.join(', ')}`;
+                    if (q.source_check?.missing?.length) body += `; missing sources: ${q.source_check.missing.join(', ')}`;
+                  }
+                  body += '\n';
+                }
+              }
+            } catch (e) {
+              body += `Could not parse results: ${e.message}`;
+            }
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
