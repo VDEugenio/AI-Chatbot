@@ -1,6 +1,6 @@
 ---
 name: VaughnKey Hardware, Power, and Mechanical Installation
-description: Full hardware build — ESP32, capacitive peephole touch sensor, DS-S012 servo, 9V battery, BLE beacon, 3D-printed housing — plus deep-sleep power architecture and servo/mechanical linkage/command-strip installation that makes the retrofit 100%% reversible.
+description: Full hardware build — ESP32, capacitive peephole touch sensor, DS-S012 servo, modified power bank, BLE beacon, 3D-printed housing — plus deep-sleep power architecture and servo/mechanical linkage/command-strip installation that makes the retrofit 100%% reversible.
 company: personal
 topics: [iot, embedded_systems, ble, low_power, hardware_design, deep_sleep, servo, mechanical_linkage, 3d_printing, installation]
 skills: [ESP32, C++, BLE, embedded_programming, hardware_integration, servo_control, mechanical_design, 3d_printing]
@@ -18,7 +18,7 @@ related_files: [smartlock_software.md, smartlock_technical_deepdive.md]
 
 - **DS-S012 servo motor (GPIO18)** — Physically actuates the deadbolt through a 3D printed gear mechanism. Selected after testing multiple servos for correct range of motion and sufficient torque to reliably turn the deadbolt.
 
-- **9V battery (temporary)** — Current power source. Lasts approximately 3-4 months with deep sleep optimization. Plans to upgrade to a more efficient battery solution in future iterations.
+- **Modified power bank** — Current power source. A standard USB power bank modified to stay on continuously (bypassing the auto-shutoff that normally cuts power when draw is too low). The ESP32's deep sleep draw (~10µA) would normally trigger a power bank's low-current shutoff, so the modification keeps it powered. Lasts approximately 3-4 months with deep sleep optimization.
 
 - **BLE beacon (nRF51822 iBeacon, ordered)** — Dedicated hardware keychain beacon that will replace phone-based BLE advertising. Constantly advertises on coin cell battery with service UUID 0x2018.
 
@@ -44,9 +44,9 @@ The entire system design prioritizes battery longevity through aggressive power 
 **Why this approach works:**
 The capacitive touch peripheral consumes virtually no power while continuously monitoring for touch events. This allows the system to be instantly responsive to user interaction while drawing negligible current between uses. With an estimated 10-15 lock/unlock cycles per day, the active time represents less than 0.1% of total operational hours.
 
-**Current battery performance:**
-- 9V battery lasts approximately 3-4 months
-- Future iterations will explore LiPo or 18650 cells for better capacity and rechargeability
+**Current power performance:**
+- Modified power bank lasts approximately 3-4 months
+- Future iterations will explore a dedicated LiPo or 18650 cell solution for better form factor and rechargeability
 
 ## Servo Mechanical System
 
@@ -124,7 +124,7 @@ Adding lock state awareness (via limit switches or current sensing) could enable
 - ESP32 microcontroller
 - Servo motor
 - 3D printed housing and gearing
-- 9V battery (current power source)
+- Modified power bank (current power source)
 - All components enclosed in command strip-mounted assembly
 
 ### Mounting System

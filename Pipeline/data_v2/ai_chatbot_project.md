@@ -7,6 +7,8 @@ skills: [ai_ml_integration, web_deployment, chatbot_development, ux_design]
 story_types: [product_pitch, problem_solving]
 ---
 
+**GitHub:** https://github.com/VDEugenio/AI-Chatbot
+
 ### AI Chatbot for Personal Website
 An AI-powered chatbot deployed on Vaughn's personal website that answers questions about his professional background, skills, and experience. The chatbot serves as an interactive resume for recruiters and hiring managers.
 

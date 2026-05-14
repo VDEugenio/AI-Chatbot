@@ -10,6 +10,8 @@ related_files: [chatbot_architecture.md, chatbot_rag_pipeline.md, chatbot_challe
 
 # AI Resume Chatbot & Portfolio Website
 
+**GitHub:** https://github.com/VDEugenio/AI-Chatbot
+
 ## What This Project Is
 
 Vaughn built a personal website centered around an AI-powered chatbot that acts as an interactive resume. Instead of sending recruiters and hiring managers a static PDF, Vaughn's site lets them have a real conversation with an AI that knows everything about his professional background — his roles, projects, technical skills, engineering decisions, and career goals.

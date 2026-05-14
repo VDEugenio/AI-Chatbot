@@ -10,14 +10,20 @@ related_files: [technical_skills.md]
 
 # Vaughn Eugenio - Professional Context
 
+## Current Status
+
+**Vaughn is currently unemployed and actively job searching** (as of April 2026). He was laid off from DraftKings in February 2026 as part of a company-wide reduction in force — his departure was not performance-related. He is not currently employed and is actively seeking his next role in Solutions Engineering, Solutions Architecture, Technical Consulting, or a similar customer-facing technical position.
+
+---
+
 ## Employment History
 
-| Company | Role | Duration |
-|---------|------|----------|
-| DraftKings | Software Engineer | May 2025 – Feb 2026 |
-| SRC Inc. | Software Engineer | Oct 2023 – May 2025 |
-| Swampfox Technologies | Software Engineer Intern | Summer 2022 |
-| Marsh McLennan | Data Analytics Intern | Summer 2021 |
+| Company | Role | Duration | Status |
+|---------|------|----------|--------|
+| DraftKings | Software Engineer | May 2025 – Feb 2026 | Ended — laid off (RIF) |
+| SRC Inc. | Software Engineer | Oct 2023 – May 2025 | Ended — left for DraftKings |
+| Swampfox Technologies | Software Engineer Intern | Summer 2022 | Internship — completed |
+| Marsh McLennan | Data Analytics Intern | Summer 2021 | Internship — completed |
 
 ---
 
@@ -54,6 +60,16 @@ With experience across backend development, cloud infrastructure, event-driven a
 
 ### Customer-Centric Thinking
 From building debugging tools for call center representatives to improving usability for operational military users to identifying edge cases affecting DraftKings customers, Vaughn consistently focuses on the end-user experience and impact.
+
+---
+
+## Personal Projects
+
+| Project | Description | GitHub |
+|---------|-------------|--------|
+| AI Resume Chatbot | RAG-powered chatbot on personal portfolio website — acts as an interactive resume | https://github.com/VDEugenio/AI-Chatbot |
+| VaughnKey | Battery-powered retrofit smart lock using ESP32, capacitive touch, and BLE | https://github.com/VDEugenio/VaughnKey |
+| Job Application Tracker | Full-stack app that connects to Gmail via OAuth, uses Claude AI to auto-classify job emails, and displays everything in a React dashboard — built in a few hours to replace a manual spreadsheet | https://github.com/VDEugenio/Job-Application-Tracker |
 
 ---
 

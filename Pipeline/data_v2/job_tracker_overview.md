@@ -10,6 +10,8 @@ related_files: [job_tracker_technical.md]
 
 # Job Application Tracker
 
+**GitHub:** https://github.com/VDEugenio/Job-Application-Tracker
+
 ## What It Is
 
 The Job Application Tracker is a full-stack personal web app that automates job application tracking during an active job search. Instead of maintaining a manual spreadsheet, it connects directly to Vaughn's Gmail account via OAuth 2.0, scrapes job-related emails, and uses Claude AI to classify each one — automatically extracting the company name, role, application status, and date. Everything is displayed in a clean, sortable, filterable React dashboard.

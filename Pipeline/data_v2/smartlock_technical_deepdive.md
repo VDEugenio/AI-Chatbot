@@ -27,17 +27,10 @@ related_files: [smartlock_hardware.md, smartlock_software.md]
 - Servo operation: 8 seconds × 500mA = 1.11mAh
 - **Total per day: ~1.63mAh**
 
-**9V battery capacity:** ~500mAh (typical alkaline)
-**Theoretical battery life:** 500mAh ÷ 1.63mAh/day = **307 days (~10 months)**
-
+**Power source:** Modified power bank (standard USB power bank with auto-shutoff bypass, since the ESP32's deep sleep draw of ~10µA would otherwise trigger the bank's low-current cutoff)
 **Observed battery life:** 3-4 months
-**Discrepancy likely due to:**
-- 9V alkaline voltage drop under load
-- Inefficient voltage regulation
-- Self-discharge
-- Peak current demands
 
-**Future improvement path:** LiPo or 18650 lithium cells provide better current delivery, lower self-discharge, and 2-3× capacity for similar weight.
+**Future improvement path:** A dedicated LiPo or 18650 cell solution would provide a cleaner form factor, better current delivery, and built-in rechargeability without needing a modified consumer power bank.
 
 ### Why Capacitive Touch is Ideal
 

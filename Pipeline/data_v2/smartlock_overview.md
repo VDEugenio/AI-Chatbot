@@ -9,6 +9,8 @@ story_types: [problem_solving, systems_thinking, product_pitch]
 
 # VaughnKey — Retrofit Smart Lock Project
 
+**GitHub:** https://github.com/VDEugenio/VaughnKey
+
 ## Project Overview
 
 VaughnKey is a battery-powered, non-invasive retrofit smart lock system built around an ESP32 microcontroller. The project was born from a real-world constraint: Vaughn wanted automated smart lock functionality for his apartment, but his landlord prohibited changing or installing new locks. Rather than accept this limitation, he designed and built a completely removable retrofit solution that mounts via command strips and requires zero permanent installation.
