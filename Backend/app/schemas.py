@@ -127,3 +127,24 @@ class CompareResponse(BaseModel):
     vector: DebugRetrieveResponse
     bm25: DebugRetrieveResponse
     hybrid_reranked: DebugRetrieveResponse
+
+
+class VisitRequest(BaseModel):
+    """Frontend tells the backend a page was viewed; backend pings Telegram."""
+
+    path: str = Field(
+        default="/",
+        max_length=512,
+        description="Path that was visited (e.g. '/', '/projects'). No domain.",
+    )
+    referrer: str | None = Field(
+        default=None,
+        max_length=2048,
+        description="document.referrer if available; null for direct visits.",
+    )
+
+
+class VisitResponse(BaseModel):
+    """Acknowledgement only. The notification is sent in a background task."""
+
+    ok: bool = True
