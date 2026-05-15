@@ -71,10 +71,10 @@ Project has evolved significantly:
 
 ### Short-term Improvements
 
-**2. Battery management system**
-- Add voltage monitoring to track battery state
+**2. Power management improvements**
+- Add voltage monitoring to track power bank state
 - Low-battery warnings (LED blink or servo behavior change)
-- Upgrade from 9V to LiPo or 18650 cells
+- Transition from modified power bank to a dedicated LiPo or 18650 cell solution
 - Add USB-C charging port to housing
 
 **3. Physical refinement**
@@ -141,7 +141,7 @@ Project has evolved significantly:
 
 **Current state:**
 - ✅ Functional prototype in daily use
-- ✅ Battery life: 3-4 months on 9V
+- ✅ Battery life: 3-4 months on modified power bank
 - ✅ Reliable lock/unlock via capacitive touch
 - ✅ BLE authentication (phone-based, interim solution)
 - ✅ Command strip mounted, fully removable
@@ -153,7 +153,7 @@ Project has evolved significantly:
 - 🔄 Documentation with detailed photos of mechanical assembly
 
 **Planned improvements:**
-- 📋 Battery upgrade (LiPo or 18650)
+- 📋 Power upgrade (dedicated LiPo or 18650 replacing modified power bank)
 - 📋 Voltage monitoring and low-battery warnings
 - 📋 Enhanced security (encrypted authentication)
 - 📋 Lock state awareness (limit switches)

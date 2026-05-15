@@ -12,6 +12,21 @@ class Message(BaseModel):
     content: str = Field(..., min_length=1)
 
 
+class VisitorContext(BaseModel):
+    """Optional visitor identity collected from the intake form."""
+
+    name: str | None = None
+    company: str | None = None
+    role: str | None = None
+
+
+class IntakeRequest(BaseModel):
+    """Frontend submits this when a visitor completes the intake form."""
+
+    visitor_context: VisitorContext
+    session_id: str | None = None
+
+
 class ChatRequest(BaseModel):
     """Incoming chat request, optionally including prior conversation turns."""
 
@@ -28,6 +43,8 @@ class ChatRequest(BaseModel):
             "message. The backend is stateless — the frontend owns this list."
         ),
     )
+    visitor_context: VisitorContext | None = None
+    session_id: str | None = None
 
 
 class SourceChunk(BaseModel):
@@ -127,3 +144,26 @@ class CompareResponse(BaseModel):
     vector: DebugRetrieveResponse
     bm25: DebugRetrieveResponse
     hybrid_reranked: DebugRetrieveResponse
+
+
+class VisitRequest(BaseModel):
+    """Frontend tells the backend a page was viewed; backend pings Telegram."""
+
+    path: str = Field(
+        default="/",
+        max_length=512,
+        description="Path that was visited (e.g. '/', '/projects'). No domain.",
+    )
+    referrer: str | None = Field(
+        default=None,
+        max_length=2048,
+        description="document.referrer if available; null for direct visits.",
+    )
+    session_id: str | None = None
+    path_chosen: str | None = None
+
+
+class VisitResponse(BaseModel):
+    """Acknowledgement only. The notification is sent in a background task."""
+
+    ok: bool = True

@@ -60,17 +60,18 @@ doorlock_claude/
 
 ## Challenges Overcome
 
-### 1. Battery Life Optimization
+### 1. Power Life Optimization
 
-**Challenge:** System needs to run for months on single battery while remaining instantly responsive.
+**Challenge:** System needs to run for months on a single power source while remaining instantly responsive. A key constraint: the ESP32's deep sleep draw (~10µA) is low enough to trigger a standard USB power bank's auto-shutoff, which cuts power when it detects negligible current draw.
 
 **Solution:**
-- Aggressive deep sleep strategy (~10µA draw)
+- Modified power bank with auto-shutoff bypass (small resistive load keeps bank active)
+- Aggressive deep sleep strategy (~10µA draw from ESP32)
 - Single ultra-low-power wake source (capacitive touch)
 - No periodic wake timers
 - BLE stack only initialized when needed, then deinitialized to free memory
 - Servo detached and pin pulled LOW when not in use
-- Result: 3-4 months on 9V battery
+- Result: 3-4 months on modified power bank
 
 ### 2. Auto-Lock When Leaving
 

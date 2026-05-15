@@ -61,7 +61,36 @@ SYSTEM_PROMPT = (
     "explicitly asks for a comparison.\n"
     "5. When citing a fact, you may reference the source document name shown "
     "in the [source: ...] tags alongside each context block.\n"
+    "6. Do not repeat information you have already shared in this conversation. "
+    "If a topic or story has already been mentioned, acknowledge it briefly and "
+    "move on to new details — don't re-explain the same project, role, or "
+    "accomplishment twice in the same thread.\n"
 )
+
+
+def get_system_prompt(visitor_context=None) -> str:
+    """
+    Return the system prompt string, optionally augmented with visitor context.
+
+    Builds a fresh string each call so the per-request injection is never
+    shared across requests (SYSTEM_PROMPT remains a pristine module constant).
+    """
+    system_prompt = SYSTEM_PROMPT
+    if visitor_context is not None:
+        lines = []
+        if getattr(visitor_context, "name", None):
+            lines.append(f"Visitor name: {visitor_context.name}")
+        if getattr(visitor_context, "company", None):
+            lines.append(f"Company: {visitor_context.company}")
+        if getattr(visitor_context, "role", None):
+            lines.append(f"Role being considered: {visitor_context.role}")
+        if lines:
+            system_prompt = system_prompt + "\n\nVisitor context:\n" + "\n".join(lines)
+            system_prompt += (
+                "\nTailor your responses to explain why Vaughn is a great fit for "
+                "this specific role and company when relevant."
+            )
+    return system_prompt
 
 
 def load_vectorstore(settings: Settings) -> Chroma:
@@ -558,7 +587,7 @@ def retrieve_rrf(
 # Kept for the /api/debug/compare endpoint so operators can still compare all
 # three retrieval modes side-by-side. The default chat path uses RRF instead.
 
-def rerank_candidates(
+async def rerank_candidates(
     llm,
     question: str,
     scored_candidates: list[tuple[Document, float]],
@@ -569,11 +598,11 @@ def rerank_candidates(
         return []
 
     texts = [doc.page_content for doc, _ in scored_candidates]
-    ranked = llm.rerank(question=question, candidates=texts, top_k=top_k)
+    ranked = await llm.rerank(question=question, candidates=texts, top_k=top_k)
     return [(scored_candidates[idx][0], score) for idx, score in ranked]
 
 
-def retrieve_hybrid(
+async def retrieve_hybrid(
     bm25_index,
     llm,
     question: str,
@@ -591,7 +620,7 @@ def retrieve_hybrid(
         enable_expansion=enable_expansion,
     )
 
-    reranked = rerank_candidates(
+    reranked = await rerank_candidates(
         llm,
         question=question,
         scored_candidates=first_stage.results,

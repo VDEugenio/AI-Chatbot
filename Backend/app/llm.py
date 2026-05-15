@@ -3,6 +3,7 @@
 import json
 import logging
 import re
+from collections.abc import AsyncIterator
 
 import anthropic
 
@@ -34,18 +35,27 @@ _RERANK_CHUNK_CHARS = 600
 _JSON_ARRAY_RE = re.compile(r"\[\s*\{.*?\}\s*\]", re.DOTALL)
 
 
+def _cached_system(text: str) -> list[dict]:
+    """Wrap a system prompt string in Anthropic's prompt-cache format.
+
+    Caches the system prompt for up to 5 minutes (ephemeral), saving prefill
+    time and token cost on every request after the first in a cache window.
+    """
+    return [{"type": "text", "text": text, "cache_control": {"type": "ephemeral"}}]
+
+
 class ClaudeClient:
-    """Single-purpose client that takes a system+user prompt and returns text."""
+    """Single-purpose async client that takes a system+user prompt and returns text."""
 
     def __init__(self, settings: Settings) -> None:
-        self._client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        self._client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
         self._model = settings.claude_model
         self._max_tokens = settings.max_tokens
         self._temperature = settings.temperature
         # Reranker can run on a cheaper/faster model if configured.
         self._rerank_model = settings.rerank_model or settings.claude_model
 
-    def answer(self, system: str, messages: list[dict]) -> str:
+    async def answer(self, system: str, messages: list[dict]) -> str:
         """
         Call Claude with a full multi-turn message list and return the text.
 
@@ -54,11 +64,11 @@ class ClaudeClient:
         user turn (which should already include any RAG context).
         """
         try:
-            response = self._client.messages.create(
+            response = await self._client.messages.create(
                 model=self._model,
                 max_tokens=self._max_tokens,
                 temperature=self._temperature,
-                system=system,
+                system=_cached_system(system),
                 messages=messages,
             )
         except anthropic.APIError as exc:
@@ -73,7 +83,30 @@ class ClaudeClient:
             raise LLMError("Claude returned no text content.")
         return "".join(text_parts).strip()
 
-    def rerank(
+    async def answer_stream(
+        self, system: str, messages: list[dict]
+    ) -> AsyncIterator[str]:
+        """
+        Stream Claude's response, yielding raw text deltas as they arrive.
+
+        The caller reassembles the full answer and signals completion to the
+        HTTP client (e.g. by sending a final SSE event).
+        """
+        try:
+            async with self._client.messages.stream(
+                model=self._model,
+                max_tokens=self._max_tokens,
+                temperature=self._temperature,
+                system=_cached_system(system),
+                messages=messages,
+            ) as stream:
+                async for text in stream.text_stream:
+                    yield text
+        except anthropic.APIError as exc:
+            logger.exception("Anthropic streaming API error")
+            raise LLMError(f"Anthropic API error: {exc}") from exc
+
+    async def rerank(
         self,
         question: str,
         candidates: list[str],
@@ -109,7 +142,7 @@ class ClaudeClient:
         )
 
         try:
-            response = self._client.messages.create(
+            response = await self._client.messages.create(
                 model=self._rerank_model,
                 max_tokens=2048,
                 temperature=0.0,

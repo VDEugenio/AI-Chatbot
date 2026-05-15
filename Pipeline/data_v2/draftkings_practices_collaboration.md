@@ -128,5 +128,5 @@ This experience reinforced my interest in **Solutions Engineering roles** where 
 
 This document represents 9 months of backend engineering experience at DraftKings, focusing on distributed systems, real-time data processing, and high-availability services for a large-scale consumer platform. The role emphasized technical depth, operational excellence, and cross-functional collaboration - all foundational skills for Solutions Engineering and Solutions Architect roles.
 
-**Last Updated:** April 2026
+**Note:** Vaughn left DraftKings in February 2026 (laid off, RIF). This document reflects his experience there — it is not a current role.
 **Contact:** Vaughn Eugenio | vaughndde@gmail.com

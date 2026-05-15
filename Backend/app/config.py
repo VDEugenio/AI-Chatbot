@@ -107,6 +107,42 @@ class Settings(BaseSettings):
     # --- HTTP ---
     cors_origins: list[str] = Field(default_factory=lambda: ["*"])
 
+    # --- Notifications (Telegram) ---
+    telegram_bot_token: str | None = Field(
+        default=None,
+        description="Telegram bot token from @BotFather. Leave unset to disable.",
+    )
+    telegram_chat_id: str | None = Field(
+        default=None,
+        description="Telegram chat id to receive notifications (from @userinfobot).",
+    )
+    enable_telegram_notifications: bool = Field(
+        default=True,
+        description=(
+            "Master switch. Even when true, notifications no-op silently if "
+            "telegram_bot_token or telegram_chat_id is missing."
+        ),
+    )
+    visit_throttle_seconds: int = Field(
+        default=3600,
+        ge=0,
+        le=86400,
+        description=(
+            "Per-IP+path throttle for /api/visit notifications, in seconds. "
+            "Set to 0 to disable throttling (every refresh pings)."
+        ),
+    )
+
+    # --- Analytics / visitor storage ---
+    sqlite_path: str = Field(
+        default="data/visitors.db",
+        description="Path to the SQLite database used for visitor and intake storage.",
+    )
+    admin_key: str = Field(
+        default="",
+        description="Secret key required to access /api/admin/visitors. Set via ADMIN_KEY env var.",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

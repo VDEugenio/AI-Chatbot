@@ -161,6 +161,10 @@ curl -X POST http://localhost:8000/api/chat ^
 | `RERANK_TOP_K`     | `8`                           | Chunks kept after Claude rerank.              |
 | `RERANK_MODEL`     | *(unset → CLAUDE_MODEL)*      | Override the model used for reranking.        |
 | `CORS_ORIGINS`     | `["*"]`                       | JSON array of allowed frontend origins.       |
+| `TELEGRAM_BOT_TOKEN` | *(unset)*                   | From @BotFather. Notifications no-op without it. |
+| `TELEGRAM_CHAT_ID` | *(unset)*                     | Your chat id from @userinfobot.               |
+| `ENABLE_TELEGRAM_NOTIFICATIONS` | `true`           | Master switch for Telegram notifications.     |
+| `VISIT_THROTTLE_SECONDS` | `3600`                  | Per-IP+path throttle window for `/api/visit`. |
 
 ## Retrieval & debugging
 
@@ -371,6 +375,88 @@ The reranked block's `score` column is Claude's relevance judgment in
 - `RERANK_MODEL`: point at a cheaper/faster Anthropic model (e.g. Haiku)
   once you're happy with quality — the rerank prompt is short and doesn't
   need the flagship model.
+
+## Telegram notifications
+
+Optional: get a phone push every time someone visits the site or uses the
+chatbot, including coarse geolocation of the visitor.
+
+### One-time Telegram setup
+
+1. In Telegram, talk to **@BotFather** → `/newbot` → pick a name → copy the
+   **bot token** it returns.
+2. Talk to **@userinfobot** to get your numeric **chat id**.
+3. Send your new bot a `/start` message (Telegram won't let it message you
+   first until you do).
+
+### Backend config
+
+In `.env` (or App Runner env vars):
+```
+TELEGRAM_BOT_TOKEN=123456:ABC-DEF-your-token-here
+TELEGRAM_CHAT_ID=123456789
+ENABLE_TELEGRAM_NOTIFICATIONS=true
+VISIT_THROTTLE_SECONDS=3600
+```
+
+If either token or chat_id is missing, the notifier silently no-ops — so
+local dev without Telegram credentials is fine.
+
+### What gets sent
+
+**Per chatbot use** (no throttle, every chat is signal):
+```
+🗨️ New chat on vaughneugenio.com
+
+Q: Can you tell me about Vaughn's experience at DraftKings?
+A: At DraftKings, Vaughn worked on the Abacus and Titan…
+
+📍 Brooklyn, New York, US
+🌐 IP: 73.x.x.x
+⚙️ vector · 8 sources · 2.4s
+🧭 Mozilla/5.0 (Macintosh; Intel Mac OS X…
+```
+
+**Per page visit** (throttled — one ping per IP+path per
+`VISIT_THROTTLE_SECONDS`):
+```
+👀 New visit to vaughneugenio.com
+
+Path: /
+📍 Brooklyn, New York, US
+🌐 IP: 73.x.x.x
+↩️ Referrer: https://www.linkedin.com/
+🧭 Mozilla/5.0 (Macintosh; Intel Mac OS X…
+```
+
+### How geolocation works
+
+Free server-side IP lookup via [ip-api.com](http://ip-api.com) (45 req/min,
+no key, HTTP — fine for backend-to-backend). Results are cached in-process
+via `lru_cache(1024)`, so repeat visitors don't burn quota. Local/private
+IPs are short-circuited to "local / private network" without an upstream
+call. Lookup failures degrade gracefully — the notification still goes
+out, just labeled "Unknown location."
+
+### `POST /api/visit`
+
+The frontend hits this on page load. Body:
+```json
+{ "path": "/", "referrer": "https://www.linkedin.com/" }
+```
+Both fields are optional. Returns `{"ok": true}` immediately; the actual
+notification is sent in a FastAPI `BackgroundTask`, so the visitor never
+waits on Telegram. See `FRONTEND_INTEGRATION.md` for the snippet to drop
+into the React frontend.
+
+### Privacy notes
+
+- Question text is logged to CloudWatch (already was) and now also sent to
+  your private Telegram chat. Don't share this Telegram chat.
+- IPs and User-Agents are sent to Telegram. Coarse city-level geolocation
+  only; no street-level data.
+- The notifier never sends Anthropic responses to anywhere except the
+  visitor's browser — only the visible answer preview is included.
 
 ## Docker
 

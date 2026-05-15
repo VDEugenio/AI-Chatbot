@@ -17,6 +17,7 @@ story_types: []
 **Company:** DraftKings
 **Position:** Software Engineer
 **Duration:** May 2025 – February 2026 (9 months)
+**Departure:** Laid off in February 2026 as part of a company-wide reduction in force (RIF). Departure was not performance-related.
 **Location:** Remote
 **Team:** DFS (Daily Fantasy Sports) Backend Engineering
 **Team Size:** 5 engineers + 1 engineering manager
