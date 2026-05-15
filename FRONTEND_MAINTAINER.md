@@ -51,7 +51,8 @@ All file paths below are relative to that root.
 | Build tool | Vite 5 |
 | Styling | Tailwind CSS 3 |
 | Markdown rendering | `react-markdown` |
-| Analytics | `@vercel/analytics` |
+| Analytics | `@vercel/analytics`, `posthog-js` |
+| Routing | `react-router-dom` |
 | Hosting | Vercel |
 
 ---
@@ -63,14 +64,18 @@ FrontendV2/
 ├── public/
 │   └── vaughn-avatar.png          # Avatar image used in chat and headers
 ├── src/
-│   ├── main.tsx                   # React entry point — mounts App, Analytics, VisitPing
-│   ├── App.tsx                    # Root component — composes all page sections and ChatPanel
-│   ├── index.css                  # Global styles, Tailwind directives, keyframe animations
+│   ├── main.tsx                   # React entry point — mounts App, initializes PostHog
+│   ├── App.tsx                    # Router shell — generates session ID, renders StarfieldBackground + routes
+│   ├── index.css                  # Global styles, Tailwind directives, keyframe animations (incl. RGB gradient)
 │   ├── vite-env.d.ts
 │   ├── api/
-│   │   └── chat.ts                # All backend API calls (askChat, askChatStream, checkHealth, stripSourceTags)
+│   │   └── chat.ts                # All backend API calls (askChatStream, logVisitorIntake, etc.)
 │   ├── types/
 │   │   └── api.ts                 # TypeScript types (Message, SourceChunk, StreamEvent, etc.)
+│   ├── pages/
+│   │   ├── LandingPage.tsx        # Split-screen landing: "Browse portfolio" (left) vs "Ask AI" (right, RGB glow)
+│   │   ├── PortfolioPage.tsx      # Full portfolio: Navbar, Hero, WorkExperience, Projects, Skills, Footer
+│   │   └── ChatPage.tsx           # Full-page chat with "Vaughn" back-button to /
 │   └── components/
 │       ├── Navbar.tsx             # Fixed top nav with active section tracking, mobile hamburger
 │       ├── Hero.tsx               # Landing section with headline, CTA, and social links
@@ -78,21 +83,21 @@ FrontendV2/
 │       ├── PersonalProjects.tsx   # Personal projects section
 │       ├── TechnicalSkills.tsx    # Skills section
 │       ├── Footer.tsx             # Contact links, GitHub, LinkedIn, Calendly button
-│       ├── StarfieldBackground.tsx # Animated canvas starfield
+│       ├── StarfieldBackground.tsx # Animated canvas starfield (rendered at App level, shared across all pages)
 │       ├── AvatarHead.tsx         # Avatar component
 │       ├── SpinningBorderButton.tsx # Reusable CTA button with rainbow spinning border
-│       ├── VisitPing.tsx          # Fires POST /api/visit on mount (Telegram notification)
+│       ├── VisitPing.tsx          # Fires POST /api/visit on mount (includes session_id)
 │       ├── CalendlyBadge.tsx      # Loads Calendly script + exports openCalendly() helper
 │       └── Chat/
-│           ├── ChatPanel.tsx      # Main chat UI — handles streaming, state, mobile/desktop layout
+│           ├── ChatPanel.tsx      # Main chat UI — intake flow (name/company → role), streaming, fullPage mode
 │           ├── ChatMessage.tsx    # Single message bubble — smooth rAF typewriter for streaming
 │           ├── TypingIndicator.tsx # Bouncing dots shown while awaiting first token
 │           ├── SourceCitations.tsx # Source chip row shown after response completes
-│           └── SuggestedPrompts.tsx # Prompt suggestions shown on empty chat state
+│           └── SuggestedPrompts.tsx # Prompt suggestions shown after intake is complete
 ├── vercel.json                    # Build config + SPA rewrite rules
 ├── tailwind.config.js             # Theme extension (colors, fonts, shadows, animations)
 ├── package.json
-└── .env                           # Local only — VITE_API_BASE=http://localhost:8000
+└── .env                           # Local only — VITE_API_BASE, VITE_POSTHOG_KEY
 ```
 
 ---
@@ -102,9 +107,10 @@ FrontendV2/
 | Variable | Where set | Value |
 |---|---|---|
 | `VITE_API_BASE` | Vercel project settings + `.env` locally | `http://localhost:8000` (local) / `https://chat.vaughneugenio.com` (prod) |
+| `VITE_POSTHOG_KEY` | Vercel project settings + `.env` locally | PostHog project API key (`phc_...`) |
 
 - Local dev: edit `.env` in the FrontendV2 root
-- Production: set via `vercel env add VITE_API_BASE production` or Vercel dashboard
+- Production: set via Vercel dashboard (Settings → Environment Variables)
 - After changing a prod env var, always redeploy: `vercel --prod`
 
 ---
@@ -235,14 +241,26 @@ Base URL: `VITE_API_BASE` (env var)
 |---|---|---|
 | `POST` | `/api/chat` | Non-streaming chat (returns full JSON) |
 | `POST` | `/api/chat/stream` | Streaming chat (SSE — preferred) |
-| `POST` | `/api/visit` | Visit ping — fires on page load |
+| `POST` | `/api/visit` | Visit ping — fires on page load (includes `session_id`, `path_chosen`) |
+| `POST` | `/api/visit/intake` | Visitor intake — fires after name/company/role collected |
+| `GET` | `/api/admin/visitors` | Admin: all visitor + intake rows (requires `X-Admin-Key` header) |
 | `GET` | `/health` | Health check |
 
-Request body for both chat endpoints:
+Request body for chat endpoints:
 ```json
 {
   "question": "string",
-  "conversation_history": [{ "role": "user|assistant", "content": "string" }]
+  "conversation_history": [{ "role": "user|assistant", "content": "string" }],
+  "visitor_context": { "name": "string", "company": "string", "role": "string" },
+  "session_id": "string"
+}
+```
+
+Request body for `/api/visit/intake`:
+```json
+{
+  "visitor_context": { "name": "string", "company": "string", "role": "string" },
+  "session_id": "string"
 }
 ```
 

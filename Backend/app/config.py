@@ -133,6 +133,16 @@ class Settings(BaseSettings):
         ),
     )
 
+    # --- Analytics / visitor storage ---
+    sqlite_path: str = Field(
+        default="data/visitors.db",
+        description="Path to the SQLite database used for visitor and intake storage.",
+    )
+    admin_key: str = Field(
+        default="",
+        description="Secret key required to access /api/admin/visitors. Set via ADMIN_KEY env var.",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

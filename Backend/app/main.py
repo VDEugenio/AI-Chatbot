@@ -22,6 +22,8 @@ from fastapi.responses import StreamingResponse
 
 from .bm25 import BM25Index
 from .config import Settings, get_settings
+from . import db
+from .geoip import lookup as geoip_lookup
 from .llm import ClaudeClient, LLMError
 from .notify import TelegramNotifier
 from .rag import (
@@ -30,6 +32,7 @@ from .rag import (
     chunk_count,
     detect_company_filter,
     format_sources,
+    get_system_prompt,
     load_vectorstore,
     retrieve,
     retrieve_bm25,
@@ -44,6 +47,7 @@ from .schemas import (
     DebugRetrieveRequest,
     DebugRetrieveResponse,
     HealthResponse,
+    IntakeRequest,
     Message,
     VisitRequest,
     VisitResponse,
@@ -92,6 +96,12 @@ async def lifespan(app: FastAPI):
     app.state.llm = None
     app.state.bm25 = None
     app.state.notifier = TelegramNotifier(settings)
+
+    try:
+        db.init_db()
+        logger.info("SQLite visitor DB initialised")
+    except Exception:
+        logger.exception("Failed to initialise SQLite DB")
 
     try:
         app.state.vectorstore = load_vectorstore(settings)
@@ -212,6 +222,10 @@ async def chat(
         "rrf" if use_hybrid else "vector",
     )
 
+    # Update last_seen for the session if the frontend provided one.
+    if payload.session_id:
+        asyncio.create_task(asyncio.to_thread(db.touch_session, payload.session_id))
+
     # Detect company-specific queries and pre-filter metadata accordingly.
     company_filter = detect_company_filter(question)
     if company_filter:
@@ -250,7 +264,8 @@ async def chat(
         ]
         messages.append({"role": "user", "content": user_prompt})
 
-        answer_text = await llm.answer(system=SYSTEM_PROMPT, messages=messages)
+        system_prompt = get_system_prompt(payload.visitor_context)
+        answer_text = await llm.answer(system=system_prompt, messages=messages)
         sources = format_sources(trace.results)
 
         # Fire-and-forget Telegram notification. No-op if creds aren't set.
@@ -265,6 +280,7 @@ async def chat(
                 sources_count=len(sources),
                 elapsed_s=time.perf_counter() - started_at,
                 user_agent=request.headers.get("user-agent"),
+                visitor_context=payload.visitor_context,
             )
 
         return ChatResponse(answer=answer_text, sources=sources)
@@ -460,6 +476,7 @@ async def _sse_chat_generator(
     sources_count: int = 0,
     started_at: float = 0.0,
     user_agent: str | None = None,
+    visitor_context=None,
 ) -> AsyncIterator[str]:
     """
     Async generator that drives the SSE stream for /api/chat/stream.
@@ -486,6 +503,7 @@ async def _sse_chat_generator(
                 sources_count=sources_count,
                 elapsed_s=time.perf_counter() - started_at,
                 user_agent=user_agent,
+                visitor_context=visitor_context,
             ))
     except LLMError as exc:
         logger.exception("LLM streaming call failed")
@@ -551,6 +569,10 @@ async def chat_stream(
         "rrf" if use_hybrid else "vector",
     )
 
+    # Update last_seen for the session if the frontend provided one.
+    if payload.session_id:
+        asyncio.create_task(asyncio.to_thread(db.touch_session, payload.session_id))
+
     company_filter = detect_company_filter(question)
     if company_filter:
         logger.info("chat/stream: company filter detected: %s", company_filter)
@@ -581,12 +603,13 @@ async def chat_stream(
     messages: list[dict] = [{"role": m.role, "content": m.content} for m in history]
     messages.append({"role": "user", "content": user_prompt})
     sources = format_sources(trace.results)
+    system_prompt = get_system_prompt(payload.visitor_context)
 
     notifier: TelegramNotifier = request.app.state.notifier
     return StreamingResponse(
         _sse_chat_generator(
             llm,
-            SYSTEM_PROMPT,
+            system_prompt,
             messages,
             sources,
             notifier=notifier,
@@ -596,6 +619,7 @@ async def chat_stream(
             sources_count=len(sources),
             started_at=started_at,
             user_agent=request.headers.get("user-agent"),
+            visitor_context=payload.visitor_context,
         ),
         media_type="text/event-stream",
         headers={
@@ -626,13 +650,76 @@ async def visit(
     notification failures, and we don't want errors here to break page
     load behavior.
     """
+    client_ip = _client_ip(request)
+    if payload.session_id:
+        geo = await asyncio.to_thread(geoip_lookup, client_ip)
+        asyncio.create_task(
+            asyncio.to_thread(
+                db.upsert_session,
+                payload.session_id, client_ip, geo,
+                payload.referrer, request.headers.get("user-agent"),
+                payload.path_chosen,
+            )
+        )
     notifier: TelegramNotifier = request.app.state.notifier
     if notifier.enabled:
         background_tasks.add_task(
             notifier.notify_visit,
-            ip=_client_ip(request),
+            ip=client_ip,
             path=payload.path,
             referrer=payload.referrer,
             user_agent=request.headers.get("user-agent"),
         )
     return VisitResponse(ok=True)
+
+
+@app.post("/api/visit/intake", tags=["meta"], summary="Submit visitor intake form")
+async def visit_intake(
+    body: IntakeRequest,
+    request: Request,
+    background_tasks: BackgroundTasks,
+):
+    """
+    Frontend submits this when the visitor completes the intake form.
+    Persists session + intake data to SQLite and fires a Telegram notification.
+    Always returns 200 — errors here must never break the user-facing flow.
+    """
+    client_ip = _client_ip(request)
+    geo = await asyncio.to_thread(geoip_lookup, client_ip)
+    ua = request.headers.get("user-agent", "")
+    if body.session_id:
+        await asyncio.to_thread(
+            db.upsert_session,
+            body.session_id, client_ip, geo,
+            request.headers.get("referer"), ua, None,
+        )
+        await asyncio.to_thread(
+            db.save_intake,
+            body.session_id,
+            body.visitor_context.name,
+            body.visitor_context.company,
+            body.visitor_context.role,
+        )
+    notifier: TelegramNotifier = request.app.state.notifier
+    background_tasks.add_task(
+        notifier.notify_intake, client_ip, geo, body.visitor_context, ua
+    )
+    return {"ok": True}
+
+
+@app.get(
+    "/api/admin/visitors",
+    tags=["admin"],
+    summary="List all visitor sessions with intake data",
+)
+async def admin_visitors(request: Request):
+    """
+    Returns all visitor sessions joined with intake submissions.
+    Requires the X-Admin-Key header to match the ADMIN_KEY env var.
+    """
+    key = request.headers.get("x-admin-key", "")
+    settings = get_settings()
+    if not settings.admin_key or key != settings.admin_key:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    rows = await asyncio.to_thread(db.get_all_visitors)
+    return rows

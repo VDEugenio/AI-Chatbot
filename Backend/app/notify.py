@@ -32,6 +32,10 @@ def _escape_html(s: str | None) -> str:
     return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+# Short alias used in notification helpers.
+_esc = _escape_html
+
+
 def _truncate(s: str, n: int) -> str:
     s = s.strip()
     if len(s) <= n:
@@ -105,6 +109,7 @@ class TelegramNotifier:
         sources_count: int,
         elapsed_s: float,
         user_agent: str | None = None,
+        visitor_context=None,
     ) -> None:
         """One ping per chatbot use. No throttling — every chat is signal."""
         if not self._enabled:
@@ -112,8 +117,20 @@ class TelegramNotifier:
         # Geo lookup is sync httpx; run off the event loop so we don't block.
         geo = await asyncio.to_thread(geoip_lookup, ip)
 
+        visitor_line = ""
+        if visitor_context is not None:
+            name = getattr(visitor_context, "name", None)
+            company = getattr(visitor_context, "company", None)
+            if name or company:
+                parts = []
+                if name:
+                    parts.append(_esc(name))
+                if company:
+                    parts.append(_esc(company))
+                visitor_line = f"\n👤 {' @ '.join(parts)}"
+
         text = (
-            "🗨️ <b>New chat on vaughneugenio.com</b>\n\n"
+            f"🗨️ <b>New chat on vaughneugenio.com</b>{visitor_line}\n\n"
             f"<b>Q:</b> {_escape_html(_truncate(question, 300))}\n"
             f"<b>A:</b> {_escape_html(_truncate(answer_preview, 220))}\n\n"
             f"📍 {_escape_html(geo.label)}\n"
@@ -160,4 +177,29 @@ class TelegramNotifier:
         )
         if user_agent:
             text += f"\n🧭 {_escape_html(_truncate(user_agent, 120))}"
+        await self._send(text)
+
+    async def notify_intake(
+        self,
+        ip: str,
+        geo,
+        visitor_context,  # VisitorContext
+        user_agent: str | None = None,
+    ) -> None:
+        """Ping when a visitor submits the intake form."""
+        if not self._enabled:
+            return
+        name = getattr(visitor_context, "name", None) or "—"
+        company = getattr(visitor_context, "company", None) or "—"
+        role = getattr(visitor_context, "role", None) or "—"
+        ua_line = f"\n🧭 <code>{_esc(user_agent[:120])}</code>" if user_agent else ""
+        text = (
+            f"🧑 <b>Intake submitted — vaughneugenio.com</b>\n\n"
+            f"👤 Name: {_esc(name)}\n"
+            f"🏢 Company: {_esc(company)}\n"
+            f"💼 Role: {_esc(role)}\n"
+            f"📍 {_esc(geo.label)}\n"
+            f"🌐 IP: <code>{_esc(ip)}</code>"
+            f"{ua_line}"
+        )
         await self._send(text)

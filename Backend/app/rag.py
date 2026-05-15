@@ -68,6 +68,31 @@ SYSTEM_PROMPT = (
 )
 
 
+def get_system_prompt(visitor_context=None) -> str:
+    """
+    Return the system prompt string, optionally augmented with visitor context.
+
+    Builds a fresh string each call so the per-request injection is never
+    shared across requests (SYSTEM_PROMPT remains a pristine module constant).
+    """
+    system_prompt = SYSTEM_PROMPT
+    if visitor_context is not None:
+        lines = []
+        if getattr(visitor_context, "name", None):
+            lines.append(f"Visitor name: {visitor_context.name}")
+        if getattr(visitor_context, "company", None):
+            lines.append(f"Company: {visitor_context.company}")
+        if getattr(visitor_context, "role", None):
+            lines.append(f"Role being considered: {visitor_context.role}")
+        if lines:
+            system_prompt = system_prompt + "\n\nVisitor context:\n" + "\n".join(lines)
+            system_prompt += (
+                "\nTailor your responses to explain why Vaughn is a great fit for "
+                "this specific role and company when relevant."
+            )
+    return system_prompt
+
+
 def load_vectorstore(settings: Settings) -> Chroma:
     """Open the persisted Chroma collection created by ingest.py."""
     os.environ.setdefault("OPENAI_API_KEY", settings.openai_api_key)
