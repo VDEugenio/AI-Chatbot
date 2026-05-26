@@ -72,3 +72,5 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 - apprunner-tasks-trust.json
 - test_results.txt
 - tests/
+
+<!-- last updated: 2026-05-26 -->
