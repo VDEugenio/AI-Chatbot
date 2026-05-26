@@ -1,0 +1,246 @@
+name: Ingest and Deploy
+
+# Triggered when the Airflow DAG commits fresh github_*.md files to main,
+# or manually via workflow_dispatch for testing.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Pipeline/data_v2/github_*.md'
+  workflow_dispatch:
+
+# Queue concurrent runs rather than cancelling them. If a deploy is pending
+# approval when a new ingest finishes, the second run waits its turn.
+concurrency:
+  group: ingest-and-deploy
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: ingest
+  # Rebuilds the ChromaDB collection from the committed source files,
+  # validates the result, uploads the collection as an artifact, and sends
+  # a Telegram notification with the GitHub approval link.
+  # ---------------------------------------------------------------------------
+  ingest:
+    runs-on: ubuntu-latest
+    outputs:
+      chunk_count: ${{ steps.validate.outputs.chunk_count }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: Pipeline/requirements.txt
+
+      - name: Install Pipeline dependencies
+        run: pip install -r Pipeline/requirements.txt
+
+      - name: Run ingest
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          cd Pipeline
+          python ingest.py --rebuild
+
+      - name: Validate index
+        id: validate
+        run: |
+          COUNT=$(python3 -c "
+          import chromadb, sys
+          client = chromadb.PersistentClient(path='Pipeline/chroma_db')
+          col = client.get_collection('vaughn_personal_docs')
+          count = col.count()
+          if count == 0:
+              print('ERROR: collection is empty after rebuild', file=sys.stderr)
+              sys.exit(1)
+          print(count)
+          ")
+          echo "chunk_count=${COUNT}" >> "$GITHUB_OUTPUT"
+          echo "Validation passed: ${COUNT} chunks"
+
+      - name: Upload chroma_db artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chroma-db-${{ github.run_id }}
+          path: Pipeline/chroma_db/
+          # Retention matches the environment approval timeout (set to 23h in
+          # GitHub Environment settings) so the artifact is always available
+          # when the deploy job runs.
+          retention-days: 1
+
+      - name: Notify Telegram - awaiting approval
+        if: success()
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "text=Ingest complete - ${{ steps.validate.outputs.chunk_count }} chunks%0AApprove deploy: ${RUN_URL}"
+
+  # ---------------------------------------------------------------------------
+  # Job 2: deploy
+  # Pauses for manual approval via the "production" GitHub Environment gate.
+  # Downloads the chroma_db artifact, builds a new Docker image, pushes to
+  # ECR, updates App Runner, and confirms the deployment is healthy.
+  # ---------------------------------------------------------------------------
+  deploy:
+    needs: ingest
+    runs-on: ubuntu-latest
+    environment: production   # <-- GitHub Environment gate fires here
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download chroma_db artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: chroma-db-${{ github.run_id }}
+          path: Pipeline/chroma_db/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | \
+            docker login --username AWS --password-stdin \
+            841979603625.dkr.ecr.us-east-1.amazonaws.com
+
+      # Guard: App Runner rejects update-service if Status != RUNNING.
+      # If a previous deploy is still in progress, wait up to 5 minutes.
+      - name: Verify App Runner is RUNNING before update
+        run: |
+          SERVICE_ARN=arn:aws:apprunner:us-east-1:841979603625:service/vaughn-rag-backend/4dddfb340c624fcb9f2b4b62598a831f
+          for i in $(seq 1 15); do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${SERVICE_ARN}" \
+              --region us-east-1 \
+              --query "Service.Status" --output text)
+            echo "Status check ${i}/15: ${STATUS}"
+            [ "${STATUS}" = "RUNNING" ] && exit 0
+            [[ "${STATUS}" == *"FAILED"* ]] && echo "Service in failed state: ${STATUS}" && exit 1
+            sleep 20
+          done
+          echo "Service never reached RUNNING before update window. Aborting." && exit 1
+
+      # Guard: parse the version integer and validate it before incrementing.
+      # If the format is not :vN, fail loudly rather than deploying as :v1.
+      - name: Determine next image tag
+        id: tag
+        run: |
+          SERVICE_ARN=arn:aws:apprunner:us-east-1:841979603625:service/vaughn-rag-backend/4dddfb340c624fcb9f2b4b62598a831f
+          CURRENT=$(aws apprunner describe-service \
+            --service-arn "${SERVICE_ARN}" \
+            --region us-east-1 \
+            --query "Service.SourceConfiguration.ImageRepository.ImageIdentifier" \
+            --output text | grep -oP ':v\K[0-9]+')
+          if [ -z "${CURRENT}" ] || ! [[ "${CURRENT}" =~ ^[0-9]+$ ]]; then
+            echo "ERROR: could not parse version integer from image identifier."
+            exit 1
+          fi
+          NEXT="v$((CURRENT + 1))"
+          echo "tag=${NEXT}" >> "$GITHUB_OUTPUT"
+          echo "Current: v${CURRENT} → Deploying as: ${NEXT}"
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f Backend/Dockerfile \
+            -t vaughn-rag-backend:${{ steps.tag.outputs.tag }} \
+            .
+
+      - name: Push to ECR
+        run: |
+          ECR=841979603625.dkr.ecr.us-east-1.amazonaws.com/vaughn-rag-backend
+          docker tag vaughn-rag-backend:${{ steps.tag.outputs.tag }} ${ECR}:${{ steps.tag.outputs.tag }}
+          docker tag vaughn-rag-backend:${{ steps.tag.outputs.tag }} ${ECR}:latest
+          docker push ${ECR}:${{ steps.tag.outputs.tag }}
+          docker push ${ECR}:latest
+
+      - name: Update App Runner service
+        run: |
+          SERVICE_ARN=arn:aws:apprunner:us-east-1:841979603625:service/vaughn-rag-backend/4dddfb340c624fcb9f2b4b62598a831f
+          ECR=841979603625.dkr.ecr.us-east-1.amazonaws.com/vaughn-rag-backend
+
+          # Always derive the new SourceConfiguration from the live service so
+          # env vars and secrets are never accidentally wiped.
+          CURRENT_SRC=$(aws apprunner describe-service \
+            --service-arn "${SERVICE_ARN}" \
+            --region us-east-1 \
+            --query "Service.SourceConfiguration" \
+            --output json)
+
+          NEW_SRC=$(echo "${CURRENT_SRC}" | python3 -c "
+          import json, sys
+          cfg = json.load(sys.stdin)
+          cfg['ImageRepository']['ImageIdentifier'] = '${ECR}:${{ steps.tag.outputs.tag }}'
+          print(json.dumps(cfg))
+          ")
+
+          aws apprunner update-service \
+            --service-arn "${SERVICE_ARN}" \
+            --region us-east-1 \
+            --source-configuration "${NEW_SRC}"
+
+      - name: Wait for RUNNING
+        run: |
+          SERVICE_ARN=arn:aws:apprunner:us-east-1:841979603625:service/vaughn-rag-backend/4dddfb340c624fcb9f2b4b62598a831f
+          for i in $(seq 1 30); do
+            STATUS=$(aws apprunner describe-service \
+              --service-arn "${SERVICE_ARN}" \
+              --region us-east-1 \
+              --query "Service.Status" --output text)
+            echo "Attempt ${i}/30: ${STATUS}"
+            [ "${STATUS}" = "RUNNING" ] && exit 0
+            [[ "${STATUS}" == *"FAILED"* ]] && echo "Deploy failed: ${STATUS}" && exit 1
+            sleep 20
+          done
+          echo "Timed out waiting for RUNNING after 10 minutes." && exit 1
+
+      - name: Smoke test
+        id: smoke
+        run: |
+          sleep 5
+          RESP=$(curl -sf https://chat.vaughneugenio.com/health)
+          echo "Health: ${RESP}"
+          python3 -c "
+          import json, sys
+          d = json.loads('${RESP}')
+          assert d['status'] == 'ok', f'Bad status: {d}'
+          assert d['chunk_count'] > 0, 'No chunks loaded'
+          print(f'OK: {d[\"chunk_count\"]} chunks')
+          "
+
+      - name: Notify Telegram - deploy succeeded
+        if: success()
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          CHUNKS=$(curl -sf https://chat.vaughneugenio.com/health | \
+            python3 -c "import json,sys; print(json.load(sys.stdin)['chunk_count'])")
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "text=Deploy ${{ steps.tag.outputs.tag }} complete - ${CHUNKS} chunks live"
+
+      - name: Notify Telegram - deploy failed
+        if: failure()
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -s -X POST "https://api.telegram.org/bot${BOT_TOKEN}/sendMessage" \
+            -d "chat_id=${CHAT_ID}" \
+            -d "text=Deploy ${{ steps.tag.outputs.tag }} FAILED: ${RUN_URL}"

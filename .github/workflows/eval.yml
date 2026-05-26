@@ -3,6 +3,8 @@ name: RAG Eval
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'Pipeline/data_v2/github_*.md'
   pull_request:
     branches: [main]
 
