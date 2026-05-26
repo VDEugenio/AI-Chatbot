@@ -33,7 +33,6 @@ from dotenv import load_dotenv
 from langchain_community.document_loaders import (
     PyPDFLoader,
     TextLoader,
-    UnstructuredMarkdownLoader,
 )
 from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document

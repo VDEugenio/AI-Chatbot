@@ -70,6 +70,7 @@ From building debugging tools for call center representatives to improving usabi
 | AI Resume Chatbot | RAG-powered chatbot on personal portfolio website — acts as an interactive resume | https://github.com/VDEugenio/AI-Chatbot |
 | VaughnKey | Battery-powered retrofit smart lock using ESP32, capacitive touch, and BLE | https://github.com/VDEugenio/VaughnKey |
 | Job Application Tracker | Full-stack app that connects to Gmail via OAuth, uses Claude AI to auto-classify job emails, and displays everything in a React dashboard — built in a few hours to replace a manual spreadsheet | https://github.com/VDEugenio/Job-Application-Tracker |
+| ADF Marketplace | A JavaScript project | https://github.com/VDEugenio/adf-marketplace |
 
 ---
 

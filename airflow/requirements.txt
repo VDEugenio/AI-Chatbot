@@ -1,0 +1,16 @@
+# Pipeline dependencies — pinned to match Pipeline/.venv to ensure the
+# ChromaDB collection written here is readable by the Backend.
+# Versions sourced from: pip freeze in Pipeline/.venv (2026-05-22)
+
+chromadb==1.5.7
+langchain-community==0.4.1
+langchain-core==1.2.27
+langchain-openai==1.1.12
+langchain-text-splitters==1.1.1
+openai==2.30.0
+pypdf==6.9.2
+python-dotenv==1.2.2
+python-frontmatter==1.1.0
+
+# GitHub API (new dependency for this DAG)
+PyGithub>=2.1.0

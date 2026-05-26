@@ -1,0 +1,10 @@
+services:
+  scheduler:
+    volumes:
+      - ../Pipeline:/pipeline:rw
+  dag-processor:
+    volumes:
+      - ../Pipeline:/pipeline:rw
+  triggerer:
+    volumes:
+      - ../Pipeline:/pipeline:rw
