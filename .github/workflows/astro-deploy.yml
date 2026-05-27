@@ -1,0 +1,28 @@
+name: Deploy to Astro Cloud
+
+# Triggers when airflow project files change — DAGs, helpers, dependencies,
+# or the Dockerfile. Does NOT trigger on github_*.md data commits (those
+# trigger ingest-and-deploy.yml instead).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'airflow/dags/**'
+      - 'airflow/include/**'
+      - 'airflow/requirements.txt'
+      - 'airflow/Dockerfile'
+      - 'airflow/packages.txt'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Astro Cloud
+        uses: astronomer/deploy-action@v0.7
+        with:
+          deployment-id: cmpncv8rk8dfc01j7s24vh17h
+          workspace-id: cmpmwef5q7wcw01j7njpvipbw
+        env:
+          ASTRONOMER_API_KEY: ${{ secrets.ASTRONOMER_API_KEY }}
