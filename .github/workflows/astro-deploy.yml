@@ -18,11 +18,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Deploy to Astro Cloud
         uses: astronomer/deploy-action@v0.7
         with:
           deployment-id: cmpncv8rk8dfc01j7s24vh17h
+          root-folder: airflow
         env:
           ASTRONOMER_API_KEY: ${{ secrets.ASTRONOMER_API_KEY }}
