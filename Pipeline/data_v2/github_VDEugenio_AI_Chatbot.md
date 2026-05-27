@@ -48,15 +48,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
-- [2026-05-15] Merge pull request #2 from VDEugenio/claude/nervous-mclaren-e6fddf
-- [2026-05-15] Add visitor intake flow, SQLite analytics, and PostHog event tracking
-- [2026-05-14] Update Pipeline data files and add frontend maintainer doc
-- [2026-05-14] Add Telegram notifier, GeoIP lookup, visit endpoint, and rerank support
-- [2026-05-06] Fix CI: add pull-requests write permission and add delay between API calls
-- [2026-05-06] Merge pull request #1 from VDEugenio/eval-layer
-- [2026-05-06] Add RAG evaluation layer with 22 test questions and CI workflow
-- [2026-04-20] updated Readme
-- [2026-04-20] first commit
+- [2026-05-27] Upgrade deploy-action to v0.13.0, fix env var name
+- [2026-05-27] Fix astro-deploy: add force=true for workflow_dispatch
+- [2026-05-27] Fix astro-deploy: remove duplicate checkout, add root-folder: airflow
+- [2026-05-27] Fix astro-deploy: remove invalid workspace-id input
+- [2026-05-27] Add workflow_dispatch to astro-deploy workflow
+- [2026-05-27] Add GitHub Actions workflow to deploy to Astro Cloud
+- [2026-05-27] chore: update airflow .dockerignore
+- [2026-05-27] Change github_ingest DAG schedule from daily to every other day
+- [2026-05-26] Trigger ingest-and-deploy workflow via trivial whitespace edit
+- [2026-05-26] Add Tier 2 automated ingest-and-deploy pipeline
 
 ## File Structure
 
@@ -67,10 +68,9 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 - FRONTEND_MAINTAINER.md
 - Pipeline/
 - README.md
+- airflow/
 - apprunner-ecr-trust.json
 - apprunner-service.example.json
 - apprunner-tasks-trust.json
 - test_results.txt
 - tests/
-
-<!-- last updated: 2026-05-26 -->
