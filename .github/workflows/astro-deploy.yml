@@ -12,6 +12,7 @@ on:
       - 'airflow/requirements.txt'
       - 'airflow/Dockerfile'
       - 'airflow/packages.txt'
+  workflow_dispatch:
 
 jobs:
   deploy:
