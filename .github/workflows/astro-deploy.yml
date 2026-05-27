@@ -23,5 +23,6 @@ jobs:
         with:
           deployment-id: cmpncv8rk8dfc01j7s24vh17h
           root-folder: airflow
+          force: true
         env:
           ASTRONOMER_API_KEY: ${{ secrets.ASTRONOMER_API_KEY }}
