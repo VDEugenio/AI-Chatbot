@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait 5 hours (debounce window)
-        run: sleep 18000
+        run: sleep 300  # TEMP: 5 min for testing — change back to 18000
 
       - name: Trigger github_ingest DAG
         run: |
