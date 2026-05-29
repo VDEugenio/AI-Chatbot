@@ -18,6 +18,33 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Astro CLI
+        run: curl -sSL https://install.astronomer.io | sudo bash -s
+
+      - name: Wake deployment if hibernating
+        run: |
+          STATE=$(astro deployment inspect cmpncv8rk8dfc01j7s24vh17h \
+            --key configuration.deployment_state \
+            --token ${{ secrets.ASTRONOMER_API_KEY }} 2>/dev/null || echo "UNKNOWN")
+          echo "Deployment state: $STATE"
+          if [[ "$STATE" == *"HIBERNAT"* ]]; then
+            echo "Deployment is hibernating — waking..."
+            astro deployment wake cmpncv8rk8dfc01j7s24vh17h \
+              --token ${{ secrets.ASTRONOMER_API_KEY }} --force
+            echo "Waiting for deployment to become active..."
+            for i in $(seq 1 20); do
+              sleep 30
+              STATE=$(astro deployment inspect cmpncv8rk8dfc01j7s24vh17h \
+                --key configuration.deployment_state \
+                --token ${{ secrets.ASTRONOMER_API_KEY }} 2>/dev/null || echo "UNKNOWN")
+              echo "  [$i] State: $STATE"
+              if [[ "$STATE" == *"ACTIVE"* || "$STATE" == *"RUNNING"* || "$STATE" == *"HEALTHY"* ]]; then
+                echo "Deployment is active."
+                break
+              fi
+            done
+          fi
+
       - name: Deploy to Astro Cloud
         uses: astronomer/deploy-action@v0.13.0
         with:
