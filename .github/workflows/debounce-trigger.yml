@@ -34,7 +34,7 @@ jobs:
           echo "Deployment state: $STATE"
           if [[ "$STATE" == *"HIBERNAT"* ]]; then
             echo "Deployment is hibernating — waking..."
-            astro deployment wake cmpncv8rk8dfc01j7s24vh17h --force
+            astro deployment wake-up cmpncv8rk8dfc01j7s24vh17h
             echo "Waiting for deployment to become healthy..."
             for i in $(seq 1 20); do
               sleep 30
