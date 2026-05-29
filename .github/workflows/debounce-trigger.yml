@@ -24,7 +24,14 @@ jobs:
 
       - name: Trigger github_ingest DAG
         run: |
-          curl -sf -X POST "${{ secrets.AIRFLOW_API_URL }}/dags/github_ingest/dagRuns" \
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+            "${{ secrets.AIRFLOW_API_URL }}/dags/github_ingest/dagRuns" \
             -H "Authorization: Bearer ${{ secrets.ASTRONOMER_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\"}"
+            -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\"}")
+          echo "Response: $RESPONSE"
+          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "Error: API returned HTTP $HTTP_STATUS"
+            exit 1
+          fi
