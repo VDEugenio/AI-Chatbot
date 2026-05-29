@@ -74,7 +74,7 @@ PORTFOLIO_REPOS: list[str] = [
 
 @dag(
     dag_id="github_ingest",
-    schedule="0 6 */2 * *",        # every other day at 6 AM UTC
+    schedule=None,                  # triggered externally via GHA debounce workflow
     start_date=datetime(2026, 5, 22),
     catchup=False,                  # don't backfill missed runs
     tags=["rag", "ingestion"],

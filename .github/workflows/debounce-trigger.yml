@@ -1,0 +1,30 @@
+name: Debounce Ingest Trigger
+
+# Fires on every push to main, EXCEPT commits that only touch Pipeline/data_v2/
+# (those are bot commits from github_ingest itself — we don't want them to
+# reset the timer or cause infinite loops).
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'Pipeline/data_v2/**'
+
+# cancel-in-progress: true is the debounce mechanism.
+# A new push cancels the currently sleeping job and starts a fresh 5-hour window.
+concurrency:
+  group: ingest-debounce
+  cancel-in-progress: true
+
+jobs:
+  wait-and-trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait 5 hours (debounce window)
+        run: sleep 18000
+
+      - name: Trigger github_ingest DAG
+        run: |
+          curl -sf -X POST "${{ secrets.AIRFLOW_API_URL }}/dags/github_ingest/dagRuns" \
+            -H "Authorization: Bearer ${{ secrets.ASTRONOMER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\"}"
