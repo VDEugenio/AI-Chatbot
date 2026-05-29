@@ -22,6 +22,34 @@ jobs:
       - name: Wait 5 hours (debounce window)
         run: sleep 300  # TEMP: 5 min for testing — change back to 18000
 
+      - name: Install Astro CLI
+        run: curl -sSL https://install.astronomer.io | sudo bash -s
+
+      - name: Wake deployment if hibernating
+        env:
+          ASTRO_API_TOKEN: ${{ secrets.ASTRONOMER_API_KEY }}
+        run: |
+          STATE=$(astro deployment inspect cmpncv8rk8dfc01j7s24vh17h \
+            --key metadata.status 2>/dev/null || echo "UNKNOWN")
+          echo "Deployment state: $STATE"
+          if [[ "$STATE" == *"HIBERNAT"* ]]; then
+            echo "Deployment is hibernating — waking..."
+            astro deployment wake cmpncv8rk8dfc01j7s24vh17h --force
+            echo "Waiting for deployment to become healthy..."
+            for i in $(seq 1 20); do
+              sleep 30
+              STATE=$(astro deployment inspect cmpncv8rk8dfc01j7s24vh17h \
+                --key metadata.status 2>/dev/null || echo "UNKNOWN")
+              echo "  [$i] State: $STATE"
+              if [[ "$STATE" == *"HEALTHY"* || "$STATE" == *"ACTIVE"* ]]; then
+                echo "Deployment is healthy — proceeding."
+                break
+              fi
+            done
+          else
+            echo "Deployment is already active — no wake needed."
+          fi
+
       - name: Trigger github_ingest DAG
         run: |
           RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
@@ -35,4 +63,4 @@ jobs:
             echo "Error: API returned HTTP $HTTP_STATUS"
             exit 1
           fi
-# test trigger Fri May 29 18:17:20 EDT 2026
+          echo "Successfully triggered github_ingest DAG."
