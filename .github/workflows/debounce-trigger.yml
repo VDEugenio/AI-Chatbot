@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait 5 hours (debounce window)
-        run: sleep 300  # TEMP: 5 min for testing — change back to 18000
+        run: sleep 18000  # 5 hours
 
       - name: Install Astro CLI
         run: curl -sSL https://install.astronomer.io | sudo bash -s
@@ -52,15 +52,14 @@ jobs:
 
       - name: Trigger github_ingest DAG
         run: |
-          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST \
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
             "${{ secrets.AIRFLOW_API_URL }}/dags/github_ingest/dagRuns" \
             -H "Authorization: Bearer ${{ secrets.ASTRONOMER_API_KEY }}" \
             -H "Content-Type: application/json" \
             -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\", \"logical_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}")
-          echo "Response: $RESPONSE"
-          HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
+          echo "API response status: $HTTP_STATUS"
           if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
             echo "Error: API returned HTTP $HTTP_STATUS"
             exit 1
           fi
-          echo "Successfully triggered github_ingest DAG."
+          echo "Successfully triggered github_ingest DAG (run: debounce_${{ github.run_id }})."
