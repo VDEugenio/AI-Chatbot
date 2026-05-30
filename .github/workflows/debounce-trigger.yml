@@ -56,7 +56,7 @@ jobs:
             "${{ secrets.AIRFLOW_API_URL }}/dags/github_ingest/dagRuns" \
             -H "Authorization: Bearer ${{ secrets.ASTRONOMER_API_KEY }}" \
             -H "Content-Type: application/json" \
-            -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\"}")
+            -d "{\"dag_run_id\": \"debounce_${{ github.run_id }}\", \"logical_date\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}")
           echo "Response: $RESPONSE"
           HTTP_STATUS=$(echo "$RESPONSE" | grep "HTTP_STATUS" | cut -d: -f2)
           if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
