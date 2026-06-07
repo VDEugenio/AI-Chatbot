@@ -48,16 +48,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
+- [2026-06-07] [bot] Update github_VDEugenio_adf_marketplace.md
+- [2026-06-07] [bot] Update github_VDEugenio_VaughnKey.md
+- [2026-06-07] [bot] Update github_VDEugenio_Job_Application_Tracker.md
+- [2026-06-07] [bot] Update github_VDEugenio_AI_Chatbot.md
 - [2026-05-30] docs: comprehensive Airflow pipeline documentation (Tier 1 + Tier 2 + debounce trigger)
 - [2026-05-30] feat: restore 5h sleep and clean up debug logging in debounce workflow
 - [2026-05-30] fix: add logical_date to dagRuns API payload (required in Airflow 3.x)
 - [2026-05-30] fix: add --force --for 2h to wake-up command to skip confirmation prompt
 - [2026-05-29] fix: use correct astro deployment wake-up command
 - [2026-05-29] fix: wake hibernating deployment before triggering github_ingest DAG
-- [2026-05-29] test: trigger debounce with correct AIRFLOW_API_URL
-- [2026-05-29] test: re-trigger debounce workflow with correct AIRFLOW_API_URL
-- [2026-05-29] debug: print curl response body and HTTP status for API diagnosis
-- [2026-05-29] temp: 5 min debounce sleep for testing
 
 ## File Structure
 
