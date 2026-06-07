@@ -8,6 +8,7 @@ locking is the real serialisation primitive; the Python lock just keeps the
 check_same_thread=False flag honest in multi-threaded use.
 """
 
+import json
 import sqlite3
 import threading
 import time
@@ -53,6 +54,17 @@ def init_db() -> None:
                 company TEXT,
                 role TEXT,
                 submitted_at REAL
+            )
+        """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS rag_review_runs (
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_id        TEXT UNIQUE NOT NULL,
+                created_at    REAL NOT NULL,
+                repos_json    TEXT NOT NULL,
+                files_json    TEXT NOT NULL,
+                enriched_json TEXT,
+                status        TEXT NOT NULL DEFAULT 'pending'
             )
         """)
         conn.commit()
@@ -114,6 +126,72 @@ def touch_session(session_id: str) -> None:
     with _lock, _conn() as conn:
         conn.execute(
             "UPDATE sessions SET last_seen=? WHERE id=?", (time.time(), session_id)
+        )
+        conn.commit()
+
+
+def save_rag_run(run_id: str, repos: list[dict], files: list[dict]) -> None:
+    """Insert or replace a RAG review run with baseline questions and formatted files."""
+    with _lock, _conn() as conn:
+        conn.execute(
+            """INSERT OR REPLACE INTO rag_review_runs
+               (run_id, created_at, repos_json, files_json, status)
+               VALUES (?, ?, ?, ?, 'pending')""",
+            (run_id, time.time(), json.dumps(repos), json.dumps(files)),
+        )
+        conn.commit()
+
+
+def get_latest_pending_run() -> dict | None:
+    """Return the most recent pending RAG review run, or None if none exist."""
+    with _lock, _conn() as conn:
+        row = conn.execute(
+            "SELECT run_id, created_at, repos_json, status FROM rag_review_runs "
+            "WHERE status='pending' ORDER BY created_at DESC LIMIT 1"
+        ).fetchone()
+    if row is None:
+        return None
+    return {
+        "run_id": row["run_id"],
+        "created_at": row["created_at"],
+        "repos": json.loads(row["repos_json"]),
+        "status": row["status"],
+    }
+
+
+def get_run(run_id: str) -> dict | None:
+    """Return a full RAG review run row by run_id, or None if not found."""
+    with _lock, _conn() as conn:
+        row = conn.execute(
+            "SELECT id, run_id, created_at, repos_json, files_json, enriched_json, status "
+            "FROM rag_review_runs WHERE run_id=?",
+            (run_id,),
+        ).fetchone()
+    if row is None:
+        return None
+    return {
+        "id": row["id"], "run_id": row["run_id"], "created_at": row["created_at"],
+        "repos_json": row["repos_json"], "files_json": row["files_json"],
+        "enriched_json": row["enriched_json"], "status": row["status"],
+    }
+
+
+def save_enriched_files(run_id: str, enriched_files: list[dict]) -> None:
+    """Store enriched markdown files for a run after Claude synthesis."""
+    with _lock, _conn() as conn:
+        conn.execute(
+            "UPDATE rag_review_runs SET enriched_json=? WHERE run_id=?",
+            (json.dumps(enriched_files), run_id),
+        )
+        conn.commit()
+
+
+def mark_run_committed(run_id: str) -> None:
+    """Mark a RAG review run as committed after DAG 2 completes."""
+    with _lock, _conn() as conn:
+        conn.execute(
+            "UPDATE rag_review_runs SET status='committed' WHERE run_id=?",
+            (run_id,),
         )
         conn.commit()
 

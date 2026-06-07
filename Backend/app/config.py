@@ -143,6 +143,20 @@ class Settings(BaseSettings):
         description="Secret key required to access /api/admin/visitors. Set via ADMIN_KEY env var.",
     )
 
+    # --- Airflow (for triggering DAG 2 after answer submission) ---
+    airflow_url: str = Field(
+        default="",
+        description="Astro Cloud deployment base URL for triggering rag_commit DAG.",
+    )
+    airflow_username: str = Field(
+        default="",
+        description="Airflow REST API username.",
+    )
+    airflow_password: str = Field(
+        default="",
+        description="Airflow REST API password or token.",
+    )
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

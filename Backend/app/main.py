@@ -16,7 +16,9 @@ import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Query, Request, status
+import httpx
+
+from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
@@ -49,9 +51,15 @@ from .schemas import (
     HealthResponse,
     IntakeRequest,
     Message,
+    RagAnswersRequest,
+    RagFilesResponse,
+    RagQuestionsRequest,
+    RagQuestionsResponse,
     VisitRequest,
     VisitResponse,
 )
+from .rag_review import synthesize_and_store
+from .db import save_rag_run, get_latest_pending_run, get_run, mark_run_committed
 
 # Hard cap on how many prior messages we forward to Claude. Keeps the request
 # bounded so a long-running thread can't blow past Claude's context window.
@@ -67,6 +75,13 @@ logging.basicConfig(
 # Real failures still surface at WARNING/ERROR.
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger("vaughn-rag")
+
+
+def verify_admin_key(x_admin_key: str = Header(default="")) -> None:
+    """Shared dependency for admin-protected endpoints."""
+    settings = get_settings()
+    if not settings.admin_key or x_admin_key != settings.admin_key:
+        raise HTTPException(status_code=403, detail="Forbidden")
 
 
 def _client_ip(request: Request) -> str:
@@ -712,14 +727,89 @@ async def visit_intake(
     tags=["admin"],
     summary="List all visitor sessions with intake data",
 )
-async def admin_visitors(request: Request):
+async def admin_visitors(_=Depends(verify_admin_key)):
     """
     Returns all visitor sessions joined with intake submissions.
     Requires the X-Admin-Key header to match the ADMIN_KEY env var.
     """
-    key = request.headers.get("x-admin-key", "")
-    settings = get_settings()
-    if not settings.admin_key or key != settings.admin_key:
-        raise HTTPException(status_code=403, detail="Forbidden")
     rows = await asyncio.to_thread(db.get_all_visitors)
     return rows
+
+
+# ---------------------------------------------------------------------------
+# RAG Review endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/api/rag-questions", tags=["rag-review"], summary="Store questions from DAG 1")
+async def save_rag_questions(body: RagQuestionsRequest):
+    """
+    Called by the Airflow github_ingest DAG after Claude generates context questions.
+    Stores the questions and baseline markdown files for later retrieval.
+    Unauthenticated — data is not sensitive (write-only, no PII).
+    """
+    await asyncio.to_thread(
+        save_rag_run,
+        body.run_id,
+        [r.model_dump() for r in body.repos],
+        [f.model_dump() for f in body.files],
+    )
+    return {"ok": True}
+
+
+@app.get(
+    "/api/rag-questions",
+    response_model=RagQuestionsResponse,
+    tags=["rag-review"],
+    summary="Fetch the latest pending review run",
+)
+async def get_rag_questions():
+    """
+    Returns the most recent pending RAG review run.
+    Called by the /rag-review frontend page to display questions.
+    Returns 404 if no pending runs exist.
+    """
+    run = await asyncio.to_thread(get_latest_pending_run)
+    if run is None:
+        raise HTTPException(status_code=404, detail="No pending RAG review runs")
+    return run
+
+
+@app.post("/api/rag-answers", tags=["rag-review"], summary="Submit answers and trigger DAG 2")
+async def submit_rag_answers(body: RagAnswersRequest):
+    """
+    Called by the /rag-review frontend on submit.
+    Synthesizes non-empty answers into enriched markdown via Claude,
+    then triggers DAG 2 (rag_commit) to commit the enriched files to GitHub.
+    Empty answers are treated as skips.
+    """
+    settings = get_settings()
+    await synthesize_and_store(body.run_id, [a.model_dump() for a in body.answers], settings)
+    if settings.airflow_url:
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{settings.airflow_url}/api/v2/dags/rag_commit/dagRuns",
+                json={"conf": {"run_id": body.run_id}},
+                auth=(settings.airflow_username, settings.airflow_password),
+                timeout=15,
+            )
+            resp.raise_for_status()
+    await asyncio.to_thread(mark_run_committed, body.run_id)
+    return {"ok": True}
+
+
+@app.get(
+    "/api/rag-run/{run_id}/files",
+    response_model=RagFilesResponse,
+    tags=["rag-review"],
+    summary="Fetch enriched files for DAG 2 to commit",
+)
+async def get_enriched_files(run_id: str, _=Depends(verify_admin_key)):
+    """
+    Called by the rag_commit DAG to retrieve the enriched markdown files
+    for a specific run before committing them to GitHub.
+    Returns 404 if the run doesn't exist or hasn't been enriched yet.
+    """
+    run = await asyncio.to_thread(get_run, run_id)
+    if run is None or run.get("enriched_json") is None:
+        raise HTTPException(status_code=404, detail="Run not found or not yet enriched")
+    return {"files": json.loads(run["enriched_json"])}

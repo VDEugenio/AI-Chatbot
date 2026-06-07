@@ -167,3 +167,45 @@ class VisitResponse(BaseModel):
     """Acknowledgement only. The notification is sent in a background task."""
 
     ok: bool = True
+
+
+# ---------------------------------------------------------------------------
+# RAG Review
+# ---------------------------------------------------------------------------
+
+class RepoQuestions(BaseModel):
+    repo_name: str
+    questions: list[str]
+
+
+class FormattedFile(BaseModel):
+    filename: str
+    content: str
+
+
+class RagQuestionsRequest(BaseModel):
+    run_id: str
+    repos: list[RepoQuestions]
+    files: list[FormattedFile]
+
+
+class RepoAnswer(BaseModel):
+    repo_name: str
+    question: str
+    answer: str  # empty string = skip
+
+
+class RagAnswersRequest(BaseModel):
+    run_id: str
+    answers: list[RepoAnswer]
+
+
+class RagQuestionsResponse(BaseModel):
+    run_id: str
+    created_at: float
+    repos: list[RepoQuestions]
+    status: str
+
+
+class RagFilesResponse(BaseModel):
+    files: list[FormattedFile]
