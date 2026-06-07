@@ -48,22 +48,23 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
-- [2026-05-27] Upgrade deploy-action to v0.13.0, fix env var name
-- [2026-05-27] Fix astro-deploy: add force=true for workflow_dispatch
-- [2026-05-27] Fix astro-deploy: remove duplicate checkout, add root-folder: airflow
-- [2026-05-27] Fix astro-deploy: remove invalid workspace-id input
-- [2026-05-27] Add workflow_dispatch to astro-deploy workflow
-- [2026-05-27] Add GitHub Actions workflow to deploy to Astro Cloud
-- [2026-05-27] chore: update airflow .dockerignore
-- [2026-05-27] Change github_ingest DAG schedule from daily to every other day
-- [2026-05-26] Trigger ingest-and-deploy workflow via trivial whitespace edit
-- [2026-05-26] Add Tier 2 automated ingest-and-deploy pipeline
+- [2026-05-30] docs: comprehensive Airflow pipeline documentation (Tier 1 + Tier 2 + debounce trigger)
+- [2026-05-30] feat: restore 5h sleep and clean up debug logging in debounce workflow
+- [2026-05-30] fix: add logical_date to dagRuns API payload (required in Airflow 3.x)
+- [2026-05-30] fix: add --force --for 2h to wake-up command to skip confirmation prompt
+- [2026-05-29] fix: use correct astro deployment wake-up command
+- [2026-05-29] fix: wake hibernating deployment before triggering github_ingest DAG
+- [2026-05-29] test: trigger debounce with correct AIRFLOW_API_URL
+- [2026-05-29] test: re-trigger debounce workflow with correct AIRFLOW_API_URL
+- [2026-05-29] debug: print curl response body and HTTP status for API diagnosis
+- [2026-05-29] temp: 5 min debounce sleep for testing
 
 ## File Structure
 
 - .dockerignore
 - .github/
 - .gitignore
+- AIRFLOW_BUILD_NOTES.md
 - Backend/
 - FRONTEND_MAINTAINER.md
 - Pipeline/
