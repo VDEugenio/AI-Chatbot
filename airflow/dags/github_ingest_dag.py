@@ -33,7 +33,6 @@ Prerequisites (set before first run):
 
 from __future__ import annotations
 
-import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -110,21 +109,13 @@ def github_ingest() -> None:
     # ------------------------------------------------------------------
     # Task 2: Format repo dicts as markdown strings.
     #
-    # Writes all markdown content to a temporary JSON file (one object per
-    # repo: {filename, content}) and returns the file path via XCom.
-    #
-    # We use a file-path XCom pattern here instead of passing the markdown
-    # strings directly. This is the correct Airflow pattern for payloads
-    # that could grow large as the repo list scales up.
+    # Returns the formatted files list directly via XCom so downstream
+    # tasks can access it without relying on a shared /tmp/ filesystem
+    # (which is not guaranteed across task containers on Astro Cloud).
     # ------------------------------------------------------------------
     @task(retries=2, retry_delay=timedelta(minutes=5))
-    def format_markdown(repos: list[dict], **context) -> str:
+    def format_markdown(repos: list[dict]) -> list[dict]:
         from markdown_formatter import filename_for_repo, repo_to_markdown
-
-        # Sanitise run_id for use as a filename (colons are valid on Linux
-        # but can cause confusion; replace for clarity).
-        run_id = context["run_id"].replace(":", "_").replace("+", "_")
-        tmp_path = f"/tmp/github_repos_{run_id}.json"
 
         files = []
         for repo in repos:
@@ -133,11 +124,8 @@ def github_ingest() -> None:
             files.append({"filename": filename, "content": content})
             print(f"[format_markdown] Formatted {filename} ({len(content)} chars)")
 
-        with open(tmp_path, "w", encoding="utf-8") as fh:
-            json.dump(files, fh, ensure_ascii=False)
-
-        print(f"[format_markdown] Wrote {len(files)} formatted file(s) to {tmp_path}")
-        return tmp_path
+        print(f"[format_markdown] Formatted {len(files)} file(s)")
+        return files
 
     # ------------------------------------------------------------------
     # Task 3: Commit formatted github_*.md files to the repo via the
@@ -152,17 +140,13 @@ def github_ingest() -> None:
     # Returns the data directory path prefix as a log-friendly confirmation.
     # ------------------------------------------------------------------
     @task(retries=2, retry_delay=timedelta(minutes=5))
-    def commit_to_github(tmp_path: str) -> str:
-        import json
+    def commit_to_github(files: list[dict]) -> str:
         from github import Github
         from github.GithubException import UnknownObjectException
 
         token = Variable.get("GITHUB_TOKEN")
         g = Github(token)
         repo = g.get_repo("VDEugenio/AI-Chatbot")
-
-        with open(tmp_path, "r", encoding="utf-8") as fh:
-            files: list[dict] = json.load(fh)
 
         incoming_names = {item["filename"] for item in files}
         data_prefix = "Pipeline/data_v2"
@@ -228,27 +212,20 @@ def github_ingest() -> None:
     #     4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
     # ------------------------------------------------------------------
     @task(trigger_rule="all_done")
-    def ask_for_context(repos: list[dict], tmp_path: str, **context) -> None:
+    def ask_for_context(**context) -> None:
         """
         Uses the Claude API to identify RAG context gaps in each fetched repo,
         then sends targeted questions to the developer via Telegram.
 
         Non-blocking: runs regardless of upstream task success/failure.
-
-        Prerequisites — set these Airflow Variables before first run:
-            ANTHROPIC_API_KEY   Your Anthropic API key
-            TELEGRAM_BOT_TOKEN  Your BotFather token
-            TELEGRAM_CHAT_ID    The chat ID for the bot conversation
-            BACKEND_URL         URL of the RAG backend (e.g. https://chat.vaughneugenio.com)
-
-        To get TELEGRAM_CHAT_ID for a new chat:
-            1. Open Telegram, find your bot, send it any message (e.g. /start)
-            2. Visit: https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
-            3. Copy the "id" value from result[0].message.chat.id
-            4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
+        Pulls repos and formatted_files from XCom explicitly to avoid
+        injection issues with trigger_rule="all_done" on Astro Cloud.
         """
-        import json as _json
         from context_asker import generate_questions, parse_questions_to_list, post_run_to_backend, send_telegram
+
+        ti = context["ti"]
+        repos: list[dict] = ti.xcom_pull(task_ids="fetch_repos") or []
+        formatted_files: list[dict] = ti.xcom_pull(task_ids="format_markdown") or []
 
         api_key     = Variable.get("ANTHROPIC_API_KEY")
         bot_token   = Variable.get("TELEGRAM_BOT_TOKEN")
@@ -256,27 +233,21 @@ def github_ingest() -> None:
         backend_url = Variable.get("BACKEND_URL")
         run_id      = context["run_id"]
 
+        print(f"[ask_for_context] Got {len(repos)} repo(s) and {len(formatted_files)} file(s) from XCom.")
+
         message = generate_questions(repos, api_key)
 
         if message.strip():
             repos_questions = parse_questions_to_list(message)
             try:
-                with open(tmp_path, "r", encoding="utf-8") as fh:
-                    formatted_files = _json.load(fh)
                 post_run_to_backend(run_id, repos_questions, formatted_files, backend_url)
                 print(f"[ask_for_context] Posted {len(repos_questions)} repo(s) to backend.")
             except Exception as exc:
                 print(f"[ask_for_context] Warning: failed to post to backend: {exc}")
-
-        if message.strip():
             send_telegram(message, bot_token, chat_id)
             print("[ask_for_context] Telegram notification sent.")
         else:
             print("[ask_for_context] Claude found no context gaps — no message sent.")
-
-        from pathlib import Path as _Path
-        _Path(tmp_path).unlink(missing_ok=True)
-        print(f"[ask_for_context] Cleaned up tmp file: {tmp_path}")
 
     # ------------------------------------------------------------------
     # Wire up task dependencies.
@@ -286,9 +257,9 @@ def github_ingest() -> None:
     # ask_for_context receives repos_data from XCom and is explicitly
     # chained after commit_to_github so it runs last.
     # ------------------------------------------------------------------
-    repos_data = fetch_repos()
-    tmp_path   = format_markdown(repos_data)
-    commit_to_github(tmp_path) >> ask_for_context(repos_data, tmp_path)
+    repos_data     = fetch_repos()
+    formatted_data = format_markdown(repos_data)
+    commit_to_github(formatted_data) >> ask_for_context()
 
 
 github_ingest()
