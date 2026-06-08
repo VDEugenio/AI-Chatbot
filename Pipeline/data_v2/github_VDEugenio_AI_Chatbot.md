@@ -48,16 +48,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
+- [2026-06-08] fix: add logical_date to Airflow DAG trigger request (Airflow 3 requirement)
+- [2026-06-08] [bot] Update github_VDEugenio_adf_marketplace.md
+- [2026-06-08] [bot] Update github_VDEugenio_VaughnKey.md
+- [2026-06-08] [bot] Update github_VDEugenio_Job_Application_Tracker.md
+- [2026-06-08] [bot] Update github_VDEugenio_AI_Chatbot.md
 - [2026-06-08] [bot] Add github_VDEugenio_adf_marketplace.md
 - [2026-06-08] [bot] Add github_VDEugenio_VaughnKey.md
 - [2026-06-08] [bot] Add github_VDEugenio_Job_Application_Tracker.md
 - [2026-06-08] [bot] Add github_VDEugenio_AI_Chatbot.md
 - [2026-06-08] fix: pass repos and files as direct XCom args to ask_for_context
-- [2026-06-08] [bot] Remove stale github_VDEugenio_adf_marketplace.md
-- [2026-06-08] [bot] Remove stale github_VDEugenio_VaughnKey.md
-- [2026-06-08] [bot] Remove stale github_VDEugenio_Job_Application_Tracker.md
-- [2026-06-08] [bot] Remove stale github_VDEugenio_AI_Chatbot.md
-- [2026-06-08] fix: remove /tmp/ file pattern, use XCom for cross-task data on Astro Cloud
 
 ## File Structure
 
