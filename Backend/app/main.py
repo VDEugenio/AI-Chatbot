@@ -785,10 +785,12 @@ async def submit_rag_answers(body: RagAnswersRequest):
     settings = get_settings()
     await synthesize_and_store(body.run_id, [a.model_dump() for a in body.answers], settings)
     if settings.airflow_url:
+        from datetime import datetime, timezone
+        logical_date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         async with httpx.AsyncClient() as client:
             resp = await client.post(
                 f"{settings.airflow_url}/api/v2/dags/rag_commit/dagRuns",
-                json={"conf": {"run_id": body.run_id}},
+                json={"conf": {"run_id": body.run_id}, "logical_date": logical_date},
                 headers={"Authorization": f"Bearer {settings.airflow_password}"},
                 timeout=15,
             )
