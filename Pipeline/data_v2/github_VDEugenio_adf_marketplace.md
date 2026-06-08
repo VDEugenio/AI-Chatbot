@@ -117,3 +117,11 @@ When using `s3`, also fill in `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS
 - adf-marketplace-brief.md
 - backend/
 - frontend/
+
+## Developer Notes
+
+The ADF Marketplace serves as a community hub for the ADF (Agent Definition Format) ecosystem. ADF files are self-contained SQLite databases that package complete autonomous agents, including their configuration, memory, files, and messaging components. "Rawl agents" refers to the project's ADF-native agents that operate within this format and can collaborate across the network.
+
+This project was built as a contribution to support the ADF open source community, providing a centralized platform similar to Hugging Face but specifically designed for agent sharing and distribution. The marketplace allows users to upload, browse, and download these portable agent packages, making it easier for developers to share and discover ADF-compatible agents.
+
+The application is currently live at https://adf-marketplace.vercel.app/, though it's running on a free database tier that doesn't persist data permanently. The developer plans to upgrade to a production database soon to provide permanent storage for uploaded agents.
