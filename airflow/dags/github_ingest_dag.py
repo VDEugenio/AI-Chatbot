@@ -203,21 +203,92 @@ def github_ingest() -> None:
                 )
                 print(f"[commit_to_github] Created {path}")
 
-        # Clean up the temp file now that we're done with it.
-        Path(tmp_path).unlink(missing_ok=True)
-
         print(f"[commit_to_github] Done — {len(files)} file(s) committed to {data_prefix}/")
         return data_prefix
+
+    # ------------------------------------------------------------------
+    # Task 4: Ask for context gaps via Claude + Telegram.
+    #
+    # Uses Claude to review the fetched repo metadata and identify gaps
+    # that would hurt RAG retrieval quality, then sends targeted questions
+    # to the developer via Telegram.
+    #
+    # trigger_rule="all_done" ensures this task runs even if upstream
+    # tasks failed (non-blocking — it only reads repos_data from XCom).
+    #
+    # Prerequisites — set these Airflow Variables before first run:
+    #     ANTHROPIC_API_KEY   Your Anthropic API key
+    #     TELEGRAM_BOT_TOKEN  Your BotFather token
+    #     TELEGRAM_CHAT_ID    The chat ID for the bot conversation
+    #
+    # To get TELEGRAM_CHAT_ID for a new chat:
+    #     1. Open Telegram, find your bot, send it any message (e.g. /start)
+    #     2. Visit: https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+    #     3. Copy the "id" value from result[0].message.chat.id
+    #     4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
+    # ------------------------------------------------------------------
+    @task(trigger_rule="all_done")
+    def ask_for_context(repos: list[dict], tmp_path: str, **context) -> None:
+        """
+        Uses the Claude API to identify RAG context gaps in each fetched repo,
+        then sends targeted questions to the developer via Telegram.
+
+        Non-blocking: runs regardless of upstream task success/failure.
+
+        Prerequisites — set these Airflow Variables before first run:
+            ANTHROPIC_API_KEY   Your Anthropic API key
+            TELEGRAM_BOT_TOKEN  Your BotFather token
+            TELEGRAM_CHAT_ID    The chat ID for the bot conversation
+            BACKEND_URL         URL of the RAG backend (e.g. https://chat.vaughneugenio.com)
+
+        To get TELEGRAM_CHAT_ID for a new chat:
+            1. Open Telegram, find your bot, send it any message (e.g. /start)
+            2. Visit: https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
+            3. Copy the "id" value from result[0].message.chat.id
+            4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
+        """
+        import json as _json
+        from context_asker import generate_questions, parse_questions_to_list, post_run_to_backend, send_telegram
+
+        api_key     = Variable.get("ANTHROPIC_API_KEY")
+        bot_token   = Variable.get("TELEGRAM_BOT_TOKEN")
+        chat_id     = Variable.get("TELEGRAM_CHAT_ID")
+        backend_url = Variable.get("BACKEND_URL")
+        run_id      = context["run_id"]
+
+        message = generate_questions(repos, api_key)
+
+        if message.strip():
+            repos_questions = parse_questions_to_list(message)
+            try:
+                with open(tmp_path, "r", encoding="utf-8") as fh:
+                    formatted_files = _json.load(fh)
+                post_run_to_backend(run_id, repos_questions, formatted_files, backend_url)
+                print(f"[ask_for_context] Posted {len(repos_questions)} repo(s) to backend.")
+            except Exception as exc:
+                print(f"[ask_for_context] Warning: failed to post to backend: {exc}")
+
+        if message.strip():
+            send_telegram(message, bot_token, chat_id)
+            print("[ask_for_context] Telegram notification sent.")
+        else:
+            print("[ask_for_context] Claude found no context gaps — no message sent.")
+
+        from pathlib import Path as _Path
+        _Path(tmp_path).unlink(missing_ok=True)
+        print(f"[ask_for_context] Cleaned up tmp file: {tmp_path}")
 
     # ------------------------------------------------------------------
     # Wire up task dependencies.
     #
     # With the TaskFlow API, passing a task's return value as an argument
     # to the next task automatically creates a dependency.
+    # ask_for_context receives repos_data from XCom and is explicitly
+    # chained after commit_to_github so it runs last.
     # ------------------------------------------------------------------
     repos_data = fetch_repos()
-    tmp_path = format_markdown(repos_data)
-    commit_to_github(tmp_path)
+    tmp_path   = format_markdown(repos_data)
+    commit_to_github(tmp_path) >> ask_for_context(repos_data, tmp_path)
 
 
 github_ingest()
