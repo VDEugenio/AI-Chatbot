@@ -789,7 +789,7 @@ async def submit_rag_answers(body: RagAnswersRequest):
             resp = await client.post(
                 f"{settings.airflow_url}/api/v2/dags/rag_commit/dagRuns",
                 json={"conf": {"run_id": body.run_id}},
-                auth=(settings.airflow_username, settings.airflow_password),
+                headers={"Authorization": f"Bearer {settings.airflow_password}"},
                 timeout=15,
             )
             resp.raise_for_status()

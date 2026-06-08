@@ -56,6 +56,10 @@ COPY --chown=appuser:appuser Backend/app ./app
 # self-contained for AWS App Runner (no volume mount required).
 COPY --chown=appuser:appuser Pipeline/chroma_db ./chroma_db
 
+# Pre-create the data/ directory so SQLite can write visitors.db at runtime
+# without needing to mkdir (which fails as non-root in App Runner).
+RUN mkdir -p /app/data && chown appuser:appuser /app/data
+
 USER appuser
 
 EXPOSE 8000
