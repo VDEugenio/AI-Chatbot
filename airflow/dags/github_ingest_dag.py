@@ -211,8 +211,8 @@ def github_ingest() -> None:
     #     3. Copy the "id" value from result[0].message.chat.id
     #     4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
     # ------------------------------------------------------------------
-    @task(trigger_rule="all_done")
-    def ask_for_context(**context) -> None:
+    @task()
+    def ask_for_context(repos: list[dict], formatted_files: list[dict], **context) -> None:
         """
         Uses the Claude API to identify RAG context gaps in each fetched repo,
         then sends targeted questions to the developer via Telegram.
@@ -223,17 +223,13 @@ def github_ingest() -> None:
         """
         from context_asker import generate_questions, parse_questions_to_list, post_run_to_backend, send_telegram
 
-        ti = context["ti"]
-        repos: list[dict] = ti.xcom_pull(task_ids="fetch_repos") or []
-        formatted_files: list[dict] = ti.xcom_pull(task_ids="format_markdown") or []
-
         api_key     = Variable.get("ANTHROPIC_API_KEY")
         bot_token   = Variable.get("TELEGRAM_BOT_TOKEN")
         chat_id     = Variable.get("TELEGRAM_CHAT_ID")
         backend_url = Variable.get("BACKEND_URL")
         run_id      = context["run_id"]
 
-        print(f"[ask_for_context] Got {len(repos)} repo(s) and {len(formatted_files)} file(s) from XCom.")
+        print(f"[ask_for_context] Got {len(repos)} repo(s) and {len(formatted_files)} file(s).")
 
         message = generate_questions(repos, api_key)
 
@@ -259,7 +255,8 @@ def github_ingest() -> None:
     # ------------------------------------------------------------------
     repos_data     = fetch_repos()
     formatted_data = format_markdown(repos_data)
-    commit_to_github(formatted_data) >> ask_for_context()
+    commit_to_github(formatted_data)
+    ask_for_context(repos_data, formatted_data)
 
 
 github_ingest()
