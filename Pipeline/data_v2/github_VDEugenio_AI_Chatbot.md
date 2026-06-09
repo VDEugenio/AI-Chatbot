@@ -48,16 +48,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
+- [2026-06-09] fix(rag_commit): use InputGitTreeElement for PyGithub 2.x compatibility
+- [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
+- [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
+- [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
+- [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
 - [2026-06-09] feat(airflow): preserve Developer Notes, fetch existing files for context, batch rag_commit
 - [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
 - [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
 - [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
 - [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
-- [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
-- [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
-- [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
-- [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
-- [2026-06-08] [bot] Enrich github_VDEugenio_adf_marketplace.md with developer notes
 
 ## File Structure
 
