@@ -25,7 +25,6 @@ Airflow Variables required:
 
 from __future__ import annotations
 
-import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -54,12 +53,13 @@ def rag_commit() -> None:
     """RAG enriched-content commit pipeline."""
 
     @task(retries=2, retry_delay=timedelta(minutes=2))
-    def fetch_enriched_files(**context) -> str:
+    def fetch_enriched_files(**context) -> list[dict]:
         """
         Fetch enriched markdown files from the backend for this run_id.
 
-        Returns the path to a temp JSON file containing a list of
-        {"filename": str, "content": str} dicts.
+        Returns the list of {"filename": str, "content": str} dicts directly
+        via XCom. No /tmp/ involved — each Astro Cloud task runs in its own
+        container, so /tmp/ is not shared between tasks.
         """
         import requests
 
@@ -79,59 +79,74 @@ def rag_commit() -> None:
 
         files: list[dict] = response.json()["files"]
         print(f"[fetch_enriched_files] Fetched {len(files)} enriched file(s) for run_id={run_id}")
-
-        run_id_safe = run_id.replace(":", "_").replace("+", "_")
-        tmp_path = f"/tmp/rag_commit_{run_id_safe}.json"
-        with open(tmp_path, "w", encoding="utf-8") as fh:
-            json.dump(files, fh, ensure_ascii=False)
-
-        return tmp_path
+        return files
 
     @task(retries=2, retry_delay=timedelta(minutes=5))
-    def commit_to_github(tmp_path: str) -> str:
+    def commit_to_github(files: list[dict]) -> str:
         """
-        Commit enriched markdown files to Pipeline/data_v2/ via the GitHub API.
+        Commit enriched markdown files to Pipeline/data_v2/ in a single batched
+        commit using the GitHub low-level Git API.
+
+        All files are uploaded as blobs, assembled into one tree, and pushed as
+        one commit — regardless of how many files are being enriched. This avoids
+        the per-file commit race where each individual commit fires a separate
+        GitHub Actions trigger and the triggers cancel each other.
 
         Only creates/updates files — never deletes (stale cleanup is handled
         by the github_ingest DAG, not this one).
         """
         from github import Github
-        from github.GithubException import UnknownObjectException
 
         token = Variable.get("GITHUB_TOKEN")
         g = Github(token)
         repo = g.get_repo("VDEugenio/AI-Chatbot")
         data_prefix = "Pipeline/data_v2"
 
-        with open(tmp_path, "r", encoding="utf-8") as fh:
-            files: list[dict] = json.load(fh)
-
+        # 1. Create a blob for every file.
+        tree_list = []
         for file_item in files:
-            path = f"{data_prefix}/{file_item['filename']}"
-            content = file_item["content"]
-            try:
-                existing = repo.get_contents(path)
-                repo.update_file(
-                    path,
-                    f"[bot] Enrich {file_item['filename']} with developer notes",
-                    content,
-                    existing.sha,
-                )
-                print(f"[commit_to_github] Updated {path}")
-            except UnknownObjectException:
-                repo.create_file(
-                    path,
-                    f"[bot] Add {file_item['filename']} with developer notes",
-                    content,
-                )
-                print(f"[commit_to_github] Created {path}")
+            blob = repo.create_git_blob(file_item["content"], "utf-8")
+            tree_list.append(
+                {
+                    "path": f"{data_prefix}/{file_item['filename']}",
+                    "mode": "100644",
+                    "type": "blob",
+                    "sha": blob.sha,
+                }
+            )
+            print(f"[commit_to_github] Blob created for {file_item['filename']} ({blob.sha[:7]})")
 
-        Path(tmp_path).unlink(missing_ok=True)
-        print(f"[commit_to_github] Done — {len(files)} file(s) committed to {data_prefix}/")
+        # 2. Resolve the current HEAD commit and its tree.
+        head_ref = repo.get_git_ref("heads/main")
+        head_sha = head_ref.object.sha
+        base_tree_sha = repo.get_git_commit(head_sha).tree.sha
+
+        # 3. Create a new tree on top of the existing one.
+        new_tree = repo.create_git_tree(
+            tree_list,
+            base_tree=repo.get_git_tree(base_tree_sha),
+        )
+
+        # 4. Create the commit.
+        n = len(files)
+        commit_message = f"[bot] Enrich {n} RAG file(s) with developer notes"
+        new_commit = repo.create_git_commit(
+            commit_message,
+            new_tree,
+            [repo.get_git_commit(head_sha)],
+        )
+
+        # 5. Advance the ref.
+        head_ref.edit(new_commit.sha)
+
+        print(
+            f"[commit_to_github] Single commit {new_commit.sha[:7]} — "
+            f"{n} file(s) pushed to {data_prefix}/"
+        )
         return data_prefix
 
-    tmp_path = fetch_enriched_files()
-    commit_to_github(tmp_path)
+    files = fetch_enriched_files()
+    commit_to_github(files)
 
 
 rag_commit()

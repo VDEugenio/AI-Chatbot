@@ -17,6 +17,7 @@ import json
 
 import anthropic
 import requests
+from github import Github
 
 _SYSTEM_PROMPT = (
     "You are a RAG knowledge-base quality reviewer. Your job is to read GitHub repo metadata "
@@ -27,13 +28,42 @@ _SYSTEM_PROMPT = (
     "whose answers would meaningfully improve the RAG knowledge base. Format your response "
     "exactly as: \"### <repo name>\\n- <question>\\n- <question>...\" with a blank line between "
     "repos. If there are no gaps across all repos, return an empty string."
+    "Where existing enriched documentation is provided, treat it as the ground truth for what "
+    "has already been answered. Only ask questions whose answers are absent or materially "
+    "incomplete in that existing content."
 )
+
+def fetch_existing_files(token: str, repo_name: str) -> dict[str, str]:
+    """
+    Fetches all existing github_*.md files from Pipeline/data_v2/ in the
+    given GitHub repo. Returns a dict mapping filename to decoded content.
+    Returns an empty dict on any failure (first run, path missing, etc.)
+    so it never blocks the DAG.
+    """
+    try:
+        from github import Github
+        g = Github(token)
+        repo = g.get_repo(repo_name)
+        contents = repo.get_contents("Pipeline/data_v2")
+        result = {}
+        for entry in contents:
+            if entry.name.startswith("github_") and entry.name.endswith(".md"):
+                try:
+                    result[entry.name] = entry.decoded_content.decode("utf-8")
+                except Exception as exc:
+                    print(f"[fetch_existing_files] Warning: could not decode {entry.name}: {exc}")
+        print(f"[fetch_existing_files] Fetched {len(result)} existing file(s).")
+        return result
+    except Exception as exc:
+        print(f"[fetch_existing_files] Warning: could not fetch existing files: {exc}")
+        return {}
+
 
 _TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
 _TELEGRAM_MAX_CHARS = 4096
 
 
-def generate_questions(repos: list[dict], api_key: str) -> str:
+def generate_questions(repos: list[dict], api_key: str, existing_files: dict | None = None) -> str:
     """
     Call Claude to identify RAG context gaps in the fetched repo metadata.
 
@@ -54,6 +84,22 @@ def generate_questions(repos: list[dict], api_key: str) -> str:
     """
     client = anthropic.Anthropic(api_key=api_key)
 
+    if existing_files:
+        existing_block = "\n\n".join(
+            f"--- {fname} ---\n{content}"
+            for fname, content in existing_files.items()
+        )
+        user_content = (
+            "=== RAW REPO METADATA (freshly fetched from GitHub API) ===\n"
+            + json.dumps(repos, ensure_ascii=False, default=str)
+            + "\n\n=== EXISTING ENRICHED DOCUMENTATION (previously committed to Pipeline/data_v2/) ===\n"
+            "The following files were written by a previous run and may already answer some questions. "
+            "Do NOT ask questions whose answers are clearly present in these files.\n\n"
+            + existing_block
+        )
+    else:
+        user_content = json.dumps(repos, ensure_ascii=False, default=str)
+
     message = client.messages.create(
         model="claude-opus-4-5",
         max_tokens=2048,
@@ -61,7 +107,7 @@ def generate_questions(repos: list[dict], api_key: str) -> str:
         messages=[
             {
                 "role": "user",
-                "content": json.dumps(repos, ensure_ascii=False, default=str),
+                "content": user_content,
             }
         ],
     )

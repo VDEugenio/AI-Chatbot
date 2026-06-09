@@ -2,10 +2,15 @@
 GitHub RAG Ingestion DAG
 ========================
 
-Runs daily. Fetches content from a hardcoded list of portfolio GitHub repos,
-formats each repo as a markdown file with YAML frontmatter, then commits the
-files directly to the repository via the GitHub API. No local filesystem
-access — fully compatible with Astro Cloud.
+Triggered externally (GHA debounce workflow). Fetches content from a
+hardcoded list of portfolio GitHub repos, formats each as a markdown file
+with YAML frontmatter, then (in parallel):
+  - commits the github_*.md files to the repo via the GitHub API, and
+  - calls Claude to identify RAG context gaps and sends targeted questions
+    to the developer via Telegram.
+
+No local filesystem access — fully compatible with Astro Cloud (each task
+runs in its own container; data is passed through XCom only).
 
 Downstream CI/CD (GitHub Actions) handles: ingest -> build -> deploy.
 
@@ -13,22 +18,25 @@ Task graph:
     fetch_repos
         -> format_markdown
             -> commit_to_github  (pushes github_*.md to repo via GitHub API)
-                        |
-            GitHub Actions handles: ingest -> build -> deploy
+            -> ask_for_context   (Claude review + Telegram notification; runs
+                                  in parallel with commit_to_github)
 
 Airflow concepts demonstrated:
     - TaskFlow API (@dag, @task decorators)
     - XCom (data passed as function return values / arguments)
-    - Path-based XCom for larger payloads (format_markdown -> commit_to_github)
     - Retries on tasks that call external APIs
-    - Airflow Variables for secrets (GITHUB_TOKEN)
+    - Airflow Variables for secrets
     - catchup=False to prevent backfill on first enable
     - Stale file cleanup for idempotent runs
     - GitHub API commits via PyGithub (no local filesystem — Astro Cloud compatible)
+    - Parallel fan-out from a single upstream task result
 
-Prerequisites (set before first run):
-    Airflow UI -> Admin -> Variables:
-        GITHUB_TOKEN    GitHub Fine-Grained PAT with Contents (read + write) permission
+Prerequisites — set these Airflow Variables before first run:
+    GITHUB_TOKEN        GitHub Fine-Grained PAT with Contents (read + write)
+    ANTHROPIC_API_KEY   Anthropic API key
+    TELEGRAM_BOT_TOKEN  Telegram bot token (from BotFather)
+    TELEGRAM_CHAT_ID    Telegram chat ID (see context_asker.py for how to obtain)
+    BACKEND_URL         RAG backend base URL (e.g. https://chat.vaughneugenio.com)
 """
 
 from __future__ import annotations
@@ -131,10 +139,13 @@ def github_ingest() -> None:
     # Task 3: Commit formatted github_*.md files to the repo via the
     # GitHub API.
     #
-    # Reads the temp JSON written by format_markdown, then uses PyGithub
-    # to create or update each file in Pipeline/data_v2/. Also deletes any
-    # stale github_*.md files in the repo that are no longer in the current
-    # fetch list.
+    # Receives the formatted files list directly from XCom (no /tmp/
+    # involved — each Astro Cloud task runs in its own container so
+    # /tmp/ is not shared across tasks).
+    #
+    # Uses PyGithub to create or update each file in Pipeline/data_v2/.
+    # Also deletes stale github_*.md files in the repo that are no
+    # longer in the current fetch list.
     #
     # No local filesystem access — fully compatible with Astro Cloud.
     # Returns the data directory path prefix as a log-friendly confirmation.
@@ -172,6 +183,11 @@ def github_ingest() -> None:
             content = file_item["content"]
             try:
                 existing = repo.get_contents(path)
+                old_content = existing.decoded_content.decode("utf-8")
+                if "## Developer Notes" in old_content:
+                    notes_section = old_content[old_content.index("## Developer Notes"):]
+                    content = content.rstrip() + "\n\n" + notes_section.strip()
+                    print(f"[commit_to_github] Preserved Developer Notes in {file_item['filename']}")
                 repo.update_file(
                     path,
                     f"[bot] Update {file_item['filename']}",
@@ -193,23 +209,13 @@ def github_ingest() -> None:
     # ------------------------------------------------------------------
     # Task 4: Ask for context gaps via Claude + Telegram.
     #
+    # Runs in parallel with commit_to_github — both receive formatted_data
+    # directly from format_markdown's XCom return value.
+    #
     # Uses Claude to review the fetched repo metadata and identify gaps
-    # that would hurt RAG retrieval quality, then sends targeted questions
-    # to the developer via Telegram.
-    #
-    # trigger_rule="all_done" ensures this task runs even if upstream
-    # tasks failed (non-blocking — it only reads repos_data from XCom).
-    #
-    # Prerequisites — set these Airflow Variables before first run:
-    #     ANTHROPIC_API_KEY   Your Anthropic API key
-    #     TELEGRAM_BOT_TOKEN  Your BotFather token
-    #     TELEGRAM_CHAT_ID    The chat ID for the bot conversation
-    #
-    # To get TELEGRAM_CHAT_ID for a new chat:
-    #     1. Open Telegram, find your bot, send it any message (e.g. /start)
-    #     2. Visit: https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getUpdates
-    #     3. Copy the "id" value from result[0].message.chat.id
-    #     4. Set that as the TELEGRAM_CHAT_ID Variable in the Airflow UI
+    # that would hurt RAG retrieval quality, then POSTs the questions +
+    # formatted files to the backend (BACKEND_URL/api/rag-questions) and
+    # sends a Telegram notification linking to vaughneugenio.com/rag-review.
     # ------------------------------------------------------------------
     @task()
     def ask_for_context(repos: list[dict], formatted_files: list[dict], **context) -> None:
@@ -217,21 +223,25 @@ def github_ingest() -> None:
         Uses the Claude API to identify RAG context gaps in each fetched repo,
         then sends targeted questions to the developer via Telegram.
 
-        Non-blocking: runs regardless of upstream task success/failure.
-        Pulls repos and formatted_files from XCom explicitly to avoid
-        injection issues with trigger_rule="all_done" on Astro Cloud.
+        Runs in parallel with commit_to_github; both fan out from format_markdown.
+        Data arrives via XCom injection (standard TaskFlow API — no trigger_rule
+        workarounds needed).
         """
-        from context_asker import generate_questions, parse_questions_to_list, post_run_to_backend, send_telegram
+        from context_asker import generate_questions, parse_questions_to_list, post_run_to_backend, send_telegram, fetch_existing_files
 
-        api_key     = Variable.get("ANTHROPIC_API_KEY")
-        bot_token   = Variable.get("TELEGRAM_BOT_TOKEN")
-        chat_id     = Variable.get("TELEGRAM_CHAT_ID")
-        backend_url = Variable.get("BACKEND_URL")
-        run_id      = context["run_id"]
+        api_key      = Variable.get("ANTHROPIC_API_KEY")
+        bot_token    = Variable.get("TELEGRAM_BOT_TOKEN")
+        chat_id      = Variable.get("TELEGRAM_CHAT_ID")
+        backend_url  = Variable.get("BACKEND_URL")
+        github_token = Variable.get("GITHUB_TOKEN")
+        run_id       = context["run_id"]
+
+        existing_files = fetch_existing_files(github_token, "VDEugenio/AI-Chatbot")
+        print(f"[ask_for_context] Fetched {len(existing_files)} existing enriched file(s) for context.")
 
         print(f"[ask_for_context] Got {len(repos)} repo(s) and {len(formatted_files)} file(s).")
 
-        message = generate_questions(repos, api_key)
+        message = generate_questions(repos, api_key, existing_files=existing_files)
 
         if message.strip():
             repos_questions = parse_questions_to_list(message)
@@ -249,9 +259,9 @@ def github_ingest() -> None:
     # Wire up task dependencies.
     #
     # With the TaskFlow API, passing a task's return value as an argument
-    # to the next task automatically creates a dependency.
-    # ask_for_context receives repos_data from XCom and is explicitly
-    # chained after commit_to_github so it runs last.
+    # automatically creates a data dependency (and therefore an execution
+    # dependency). commit_to_github and ask_for_context both depend on
+    # format_markdown and run in parallel once it completes.
     # ------------------------------------------------------------------
     repos_data     = fetch_repos()
     formatted_data = format_markdown(repos_data)
