@@ -95,7 +95,7 @@ def rag_commit() -> None:
         Only creates/updates files — never deletes (stale cleanup is handled
         by the github_ingest DAG, not this one).
         """
-        from github import Github
+        from github import Github, InputGitTreeElement
 
         token = Variable.get("GITHUB_TOKEN")
         g = Github(token)
@@ -103,31 +103,35 @@ def rag_commit() -> None:
         data_prefix = "Pipeline/data_v2"
 
         # 1. Create a blob for every file.
-        tree_list = []
+        blobs = []
         for file_item in files:
             blob = repo.create_git_blob(file_item["content"], "utf-8")
-            tree_list.append(
-                {
-                    "path": f"{data_prefix}/{file_item['filename']}",
-                    "mode": "100644",
-                    "type": "blob",
-                    "sha": blob.sha,
-                }
-            )
+            blobs.append(blob)
             print(f"[commit_to_github] Blob created for {file_item['filename']} ({blob.sha[:7]})")
 
-        # 2. Resolve the current HEAD commit and its tree.
+        # 2. Build the tree using InputGitTreeElement objects (required by PyGithub 2.x).
+        tree_list = [
+            InputGitTreeElement(
+                path=f"{data_prefix}/{file_item['filename']}",
+                mode="100644",
+                type="blob",
+                sha=blob.sha,
+            )
+            for file_item, blob in zip(files, blobs)
+        ]
+
+        # 3. Resolve the current HEAD commit and its tree.
         head_ref = repo.get_git_ref("heads/main")
         head_sha = head_ref.object.sha
         base_tree_sha = repo.get_git_commit(head_sha).tree.sha
 
-        # 3. Create a new tree on top of the existing one.
+        # 4. Create a new tree on top of the existing one.
         new_tree = repo.create_git_tree(
             tree_list,
             base_tree=repo.get_git_tree(base_tree_sha),
         )
 
-        # 4. Create the commit.
+        # 5. Create the commit.
         n = len(files)
         commit_message = f"[bot] Enrich {n} RAG file(s) with developer notes"
         new_commit = repo.create_git_commit(
@@ -136,7 +140,7 @@ def rag_commit() -> None:
             [repo.get_git_commit(head_sha)],
         )
 
-        # 5. Advance the ref.
+        # 6. Advance the ref.
         head_ref.edit(new_commit.sha)
 
         print(
