@@ -11,7 +11,7 @@ client ──HTTP──▶ FastAPI (/api/chat)
                     │
                     ├─▶ OpenAI embeddings (embed question)
                     ├─▶ ChromaDB (similarity search, top-k)
-                    └─▶ Claude (claude-sonnet-4-20250514)
+                    └─▶ Claude (claude-sonnet-4-6)
 ```
 
 The vector store is the one produced by `../Pipeline/ingest.py`. The
@@ -53,7 +53,7 @@ On startup you should see something like:
 
 ```
 [INFO] vaughn-rag: Vectorstore loaded: 137 chunks
-[INFO] vaughn-rag: Anthropic client initialized (model=claude-sonnet-4-20250514)
+[INFO] vaughn-rag: Anthropic client initialized (model=claude-sonnet-4-6)
 ```
 
 Interactive API docs (Swagger UI): http://localhost:8000/docs
@@ -150,7 +150,7 @@ curl -X POST http://localhost:8000/api/chat ^
 | `CHROMA_DIR`       | `../Pipeline/chroma_db`       | Path to the persisted Chroma directory.       |
 | `COLLECTION_NAME`  | `vaughn_personal_docs`        | Must match `ingest.py`.                       |
 | `EMBEDDING_MODEL`  | `text-embedding-3-small`      | Must match `ingest.py`.                       |
-| `CLAUDE_MODEL`     | `claude-sonnet-4-20250514`    | Anthropic model id.                           |
+| `CLAUDE_MODEL`     | `claude-sonnet-4-6`    | Anthropic model id.                           |
 | `MAX_TOKENS`       | `1024`                        | Cap on Claude response length.                |
 | `TEMPERATURE`      | `0.2`                         | Lower = more deterministic.                   |
 | `TOP_K`            | `10`                          | Number of chunks retrieved per question.      |

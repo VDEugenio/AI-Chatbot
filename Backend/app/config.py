@@ -47,7 +47,7 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     claude_model: str = Field(
-        default="claude-sonnet-4-20250514",
+        default="claude-sonnet-4-6",
         description="Anthropic model id used for chat completions.",
     )
     max_tokens: int = Field(default=2048, ge=1, le=8192)
