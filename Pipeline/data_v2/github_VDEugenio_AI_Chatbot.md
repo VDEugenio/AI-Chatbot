@@ -48,16 +48,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
+- [2026-06-15] chore: update Claude model to claude-sonnet-4-6 (retire claude-sonnet-4-20250514)
 - [2026-06-09] [bot] Enrich 4 RAG file(s) with developer notes
 - [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
 - [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
 - [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
 - [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
-- [2026-06-09] fix(rag_commit): use InputGitTreeElement for PyGithub 2.x compatibility
+- [2026-06-09] [bot] Enrich 4 RAG file(s) with developer notes
 - [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
 - [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
 - [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
-- [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
 
 ## File Structure
 
