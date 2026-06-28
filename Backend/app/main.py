@@ -20,7 +20,7 @@ import httpx
 
 from fastapi import BackgroundTasks, Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse
 
 from .bm25 import BM25Index
 from .config import Settings, get_settings
@@ -734,6 +734,47 @@ async def admin_visitors(_=Depends(verify_admin_key)):
     """
     rows = await asyncio.to_thread(db.get_all_visitors)
     return rows
+
+
+# ---------------------------------------------------------------------------
+# Tracking link redirect
+# ---------------------------------------------------------------------------
+
+HOMEPAGE_URL = "https://vaughneugenio.com"
+
+
+def _decode_tracking_slug(slug: str) -> str:
+    """URL-safe base64 decode: - → +, _ → /, re-add stripped = padding."""
+    import base64
+    b64 = slug.replace("-", "+").replace("_", "/")
+    b64 += "=" * (-len(b64) % 4)
+    try:
+        return base64.b64decode(b64).decode("utf-8")
+    except Exception:
+        return slug
+
+
+@app.get("/r/{slug}", tags=["meta"], summary="Tracking link redirect")
+async def tracking_redirect(
+    slug: str,
+    request: Request,
+    background_tasks: BackgroundTasks,
+):
+    """
+    Redirect tracking links to the homepage and fire a Telegram notification.
+    The slug is URL-safe base64 of the recipient name (e.g. btoa("Tariq Ahmed")).
+    """
+    name = _decode_tracking_slug(slug)
+    client_ip = _client_ip(request)
+    notifier: TelegramNotifier = request.app.state.notifier
+    if notifier.enabled:
+        background_tasks.add_task(
+            notifier.notify_tracking_link,
+            slug=name,
+            ip=client_ip,
+            user_agent=request.headers.get("user-agent"),
+        )
+    return RedirectResponse(url=f"{HOMEPAGE_URL}?ref={slug}", status_code=302)
 
 
 # ---------------------------------------------------------------------------

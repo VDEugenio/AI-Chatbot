@@ -179,6 +179,27 @@ class TelegramNotifier:
             text += f"\n🧭 {_escape_html(_truncate(user_agent, 120))}"
         await self._send(text)
 
+    async def notify_tracking_link(
+        self,
+        slug: str,
+        ip: str,
+        user_agent: str | None = None,
+    ) -> None:
+        """Ping when someone follows a tracking link (/r/{slug})."""
+        if not self._enabled:
+            return
+        geo = await asyncio.to_thread(geoip_lookup, ip)
+        name = slug.replace("-", " ").title()
+        ua_line = f"\n🧭 {_esc(_truncate(user_agent, 120))}" if user_agent else ""
+        text = (
+            f"🔗 <b>Tracking link opened</b>\n\n"
+            f"👤 {_esc(name)}\n"
+            f"📍 {_esc(geo.label)}\n"
+            f"🌐 IP: <code>{_esc(ip)}</code>"
+            f"{ua_line}"
+        )
+        await self._send(text)
+
     async def notify_intake(
         self,
         ip: str,
