@@ -13,6 +13,7 @@ import asyncio
 import json
 import logging
 import time
+import urllib.parse
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -741,40 +742,48 @@ async def admin_visitors(_=Depends(verify_admin_key)):
 # ---------------------------------------------------------------------------
 
 HOMEPAGE_URL = "https://vaughneugenio.com"
+OUTREACH_BACKEND = "https://outreach-backend-production-326e.up.railway.app"
 
 
-def _decode_tracking_slug(slug: str) -> str:
-    """URL-safe base64 decode: - → +, _ → /, re-add stripped = padding."""
-    import base64
-    b64 = slug.replace("-", "+").replace("_", "/")
-    b64 += "=" * (-len(b64) % 4)
-    try:
-        return base64.b64decode(b64).decode("utf-8")
-    except Exception:
-        return slug
-
-
-@app.get("/r/{slug}", tags=["meta"], summary="Tracking link redirect")
+@app.get("/r/{uid}", tags=["meta"], summary="Tracking link redirect")
 async def tracking_redirect(
-    slug: str,
+    uid: str,
     request: Request,
     background_tasks: BackgroundTasks,
 ):
     """
-    Redirect tracking links to the homepage and fire a Telegram notification.
-    The slug is URL-safe base64 of the recipient name (e.g. btoa("Tariq Ahmed")).
+    Hit the outreach backend to log the visit, then redirect to the homepage.
+    The outreach backend records the timestamp and IP automatically.
+    Never shows an error to the visitor — always redirects regardless.
     """
-    name = _decode_tracking_slug(slug)
     client_ip = _client_ip(request)
+    name: str | None = None
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(
+                f"{OUTREACH_BACKEND}/r/{uid}",
+                headers={"X-Forwarded-For": client_ip},
+            )
+            if resp.status_code == 200:
+                data = resp.json()
+                first = data.get("first_name") or ""
+                last = data.get("last_name") or ""
+                name = f"{first} {last}".strip() or None
+    except Exception:
+        pass
+
     notifier: TelegramNotifier = request.app.state.notifier
     if notifier.enabled:
         background_tasks.add_task(
             notifier.notify_tracking_link,
-            slug=name,
+            slug=name or uid,
             ip=client_ip,
             user_agent=request.headers.get("user-agent"),
         )
-    return RedirectResponse(url=f"{HOMEPAGE_URL}?ref={slug}", status_code=302)
+
+    redirect_url = f"{HOMEPAGE_URL}?ref={urllib.parse.quote(name)}" if name else HOMEPAGE_URL
+    return RedirectResponse(url=redirect_url, status_code=302)
 
 
 # ---------------------------------------------------------------------------
