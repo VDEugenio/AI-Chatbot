@@ -1,6 +1,6 @@
 ---
 name: AI Resume Chatbot — RAG Pipeline and Knowledge Base Design
-description: How the knowledge base is structured (29 topic-scoped markdown files with YAML frontmatter), how chunking evolved from 500-char fragments to 1800-char header-aware sections, and how RRF hybrid retrieval with query expansion and company metadata filtering works.
+description: How the knowledge base is structured (~40 topic-scoped markdown files with YAML frontmatter), how chunking evolved from 500-char fragments to 1800-char header-aware sections, and how RRF hybrid retrieval with query expansion and company metadata filtering works.
 company: personal
 topics: [rag, retrieval, vector_search, bm25, hybrid_search, chunking, knowledge_base_design, embeddings, prompt_engineering]
 skills: [rag_architecture, vector_databases, ChromaDB, OpenAI_embeddings, BM25, query_expansion, metadata_filtering, prompt_engineering]
@@ -21,14 +21,14 @@ RAG solves this by storing detailed knowledge externally and retrieving only the
 
 ## Knowledge Base Structure
 
-The knowledge base is **29 topic-scoped markdown files** in `Pipeline/data_v2/`. Each file covers one specific aspect of Vaughn's professional background:
+The knowledge base is a set of **~40 topic-scoped markdown files** in `Pipeline/data_v2/` — and it keeps growing, both hand-authored and via an Airflow pipeline that syncs content from Vaughn's GitHub activity. Each file covers one specific aspect of Vaughn's professional background:
 
 ### Organization by Domain
-- **Profile** (4 files): overview, education, skills inventory, hobbies
-- **DraftKings** (7 files): role/stack, architecture, performance, Ohtani project, feature flags, incident response, collaboration practices
-- **SRC Inc** (8 files): role overview, TrackSync architecture, optimizations, COP-is-King framework, tech stack, customer engagement, COMET app, SE narratives/STAR stories
-- **VaughnKey** (7 files): overview, hardware, software, UX, dev challenges, lessons, technical deep dive
-- **Other** (3 files): AI chatbot project, internships (Swampfox, Marsh McLennan)
+- **Profile**: overview, education, skills inventory, hobbies, internships (Swampfox, Marsh McLennan)
+- **DraftKings**: role/stack, architecture, performance, Ohtani project, feature flags, incident response, collaboration practices
+- **SRC Inc**: role overview, TrackSync architecture, optimizations, COP-is-King framework, tech stack, customer engagement, COMET app, SE positioning narratives
+- **VaughnKey**: overview, hardware, software, UX, dev challenges, lessons, technical deep dive
+- **Personal projects**: the AI chatbot itself (architecture, RAG pipeline, decisions, eval harness), the Job Application Tracker, GitHub-generated repo summaries, and aggregation files (projects index, skills evidence map)
 
 ### YAML Frontmatter as Metadata
 Every file has a YAML header with structured metadata:
@@ -65,7 +65,7 @@ splitter = RecursiveCharacterTextSplitter(
 )
 ```
 
-**Result:** 99 rich chunks instead of 137 small ones. A complete STAR story or architecture explanation now fits in 1-2 chunks. The LLM sees coherent context, not fragments.
+**Result:** at the time of the redesign, the same corpus went from 137 fragmented chunks to 99 richer ones — fewer, bigger chunks. (The corpus has grown since; the strategy is what matters, not those point-in-time counts.) A complete STAR story or architecture explanation now fits in 1-2 chunks. The LLM sees coherent context, not fragments.
 
 ## Retrieval Pipeline
 

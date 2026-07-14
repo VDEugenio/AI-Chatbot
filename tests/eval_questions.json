@@ -233,8 +233,8 @@
     "id": "Q25",
     "question": "What personal projects has Vaughn worked on?",
     "topic": "projects",
-    "expected_keywords": ["VaughnKey", "chatbot", "tracker", "marketplace"],
-    "min_keywords_required": 4,
+    "expected_keywords": ["VaughnKey", "chatbot", "tracker", "marketplace", "outreach"],
+    "min_keywords_required": 5,
     "expected_sources": ["projects_index.md", "job_tracker_overview.md", "github_VDEugenio_adf_marketplace.md"],
     "min_sources_required": 1,
     "notes": "Known failure (2026-07): bot listed only VaughnKey and the chatbot, missing job tracker and adf-marketplace. Requires full enumeration of all four projects. projects_index.md is the planned Phase 1 canonical list; adf-marketplace currently only exists as a company:github file"

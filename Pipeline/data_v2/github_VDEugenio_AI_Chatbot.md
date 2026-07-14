@@ -1,10 +1,14 @@
 ---
 name: AI-Chatbot (GitHub Repository)
-company: github
-topics: [github, portfolio, open_source]
+company: personal
+source: github_dag
+repo_url: https://github.com/VDEugenio/AI-Chatbot
+topics: [github, portfolio, open_source, personal_projects]
 skills: []
 story_types: [project]
 ---
+
+This is one of Vaughn's personal projects. **GitHub repository:** https://github.com/VDEugenio/AI-Chatbot
 
 ## Overview
 

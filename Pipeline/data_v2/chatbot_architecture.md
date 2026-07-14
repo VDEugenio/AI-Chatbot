@@ -68,7 +68,7 @@ The frontend has two main components that live side-by-side:
 ### Portfolio Drawer (`PortfolioDrawer.tsx`)
 A sidebar (or expandable drawer on mobile) displaying:
 - Work experience timeline with company, role, and dates
-- Personal projects (VaughnKey, this chatbot)
+- Personal projects (see projects_index.md for the full list)
 - Skills and tech stack inventory
 - Contact information and social links (LinkedIn, GitHub, email)
 
@@ -87,7 +87,7 @@ The ingestion pipeline builds the ChromaDB vector store from the knowledge base:
 
 1. **Load** — reads all `.md` / `.pdf` / `.txt` files from `data_v2/`
 2. **Parse frontmatter** — extracts YAML metadata (`company`, `topics`, `skills`, `story_types`) and stores on every chunk
-3. **Chunk** — splits on markdown headers (`## / ###`) first, then by character limit (1800 chars, 200 overlap) to keep narrative sections intact
+3. **Chunk** — header-aware splitting that keeps narrative sections intact (the chunking strategy and its parameters are covered in the RAG pipeline design — see `chatbot_rag_pipeline.md`)
 4. **Embed** — sends chunks to OpenAI `text-embedding-3-small`
 5. **Store** — persists to ChromaDB; deletes the existing collection first to prevent accumulation
 
