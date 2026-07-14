@@ -52,16 +52,16 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 
 ## Recent Activity
 
-- [2026-06-15] chore: update Claude model to claude-sonnet-4-6 (retire claude-sonnet-4-20250514)
-- [2026-06-09] [bot] Enrich 4 RAG file(s) with developer notes
-- [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
-- [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
-- [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
-- [2026-06-09] [bot] Update github_VDEugenio_AI_Chatbot.md
-- [2026-06-09] [bot] Enrich 4 RAG file(s) with developer notes
-- [2026-06-09] [bot] Update github_VDEugenio_adf_marketplace.md
-- [2026-06-09] [bot] Update github_VDEugenio_VaughnKey.md
-- [2026-06-09] [bot] Update github_VDEugenio_Job_Application_Tracker.md
+- [2026-07-14] Merge pull request #3 from VDEugenio/corpus-restructure
+- [2026-07-14] fix retrieval: narrow query expansion, ingest metadata upgrades, aggregation tuning
+- [2026-07-14] airflow: personal/source taxonomy in formatter, repo_url + link line, add outreach-extension to PORT
+- [2026-07-14] corpus: restructure data_v2 - aggregation layer, dedupe, taxonomy + stale-fact fixes
+- [2026-07-14] eval: add Q24/Q25 known-failure questions, save baseline, fix Windows UTF-8 output
+- [2026-07-14] chore: sync context_asker docstrings; move frontend maintainer doc to .claude/agents
+- [2026-07-14] data: expand target roles in profile overview (Sales Eng, FDE, TAM, CRE)
+- [2026-07-14] feat: add local Kubernetes deployment with ChromaDB HTTP mode support
+- [2026-06-30] feat: delegate tracking link lookup to outreach backend
+- [2026-06-28] feat: add tracking link redirect endpoint with Telegram notifications
 
 ## File Structure
 
@@ -70,7 +70,6 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 - .gitignore
 - AIRFLOW_BUILD_NOTES.md
 - Backend/
-- FRONTEND_MAINTAINER.md
 - Pipeline/
 - RAG_REVIEW_SYSTEM.md
 - README.md
@@ -78,6 +77,7 @@ Run once (or whenever documents change). Reads documents from `Pipeline/data_v2/
 - apprunner-ecr-trust.json
 - apprunner-service.example.json
 - apprunner-tasks-trust.json
+- k8s/
 - test_results.txt
 - tests/
 
