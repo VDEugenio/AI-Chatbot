@@ -36,6 +36,19 @@ class Settings(BaseSettings):
         default="../Pipeline/chroma_db",
         description="Path to the persisted Chroma directory created by ingest.py.",
     )
+    chroma_mode: str = Field(
+    default="embedded",
+    description="ChromaDB mode: 'embedded' for local file, 'http' for remote server.",
+    )
+    chroma_host: str = Field(
+        default="localhost",
+        description="ChromaDB server host. Only used when chroma_mode=http.",
+    )
+    chroma_port: int = Field(
+        default=8000,
+        description="ChromaDB server port. Only used when chroma_mode=http.",
+    )
+
     collection_name: str = Field(
         default="vaughn_personal_docs",
         description="Chroma collection name; must match ingest.py.",

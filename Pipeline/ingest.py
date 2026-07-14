@@ -228,34 +228,61 @@ def build_vectorstore(chunks: list) -> Chroma:
     import chromadb
 
     embeddings = OpenAIEmbeddings(model=EMBEDDING_MODEL)
-    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Explicitly delete the existing collection (by name) before recreating so
-    # repeated runs don't accumulate duplicate chunks in ChromaDB's global state.
-    try:
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        existing = [c.name for c in client.list_collections()]
-        if COLLECTION_NAME in existing:
-            client.delete_collection(COLLECTION_NAME)
-            print(f"[build] deleted existing collection '{COLLECTION_NAME}'")
-    except Exception as e:
-        print(f"[build] could not delete existing collection (may not exist): {e}")
-
+    
     incoming = len(chunks)
     print(f"[embed] sending {incoming} chunks to OpenAI for embedding...")
 
     for c in chunks:
         c.metadata.pop("_raw_char_count", None)
 
-    vectorstore = Chroma.from_documents(
-        documents=chunks,
-        embedding=embeddings,
-        collection_name=COLLECTION_NAME,
-        persist_directory=str(CHROMA_DIR),
-    )
+    if os.environ.get("CHROMA_MODE") == "http":
+
+        try:
+            client = chromadb.HttpClient(
+                host=os.environ.get("CHROMA_HOST"),
+                port=int(os.environ.get("CHROMA_PORT", "8001")),
+            )
+            existing = [c.name for c in client.list_collections()]
+            if COLLECTION_NAME in existing:
+                client.delete_collection(COLLECTION_NAME)
+                print(f"[build] deleted existing collection '{COLLECTION_NAME}'")
+        except Exception as e:
+            print(f"[build] could not delete existing collection (may not exist): {e}")
+
+
+        vectorstore = Chroma.from_documents(
+            documents=chunks,
+            embedding=embeddings,
+            collection_name=COLLECTION_NAME,
+            client=chromadb.HttpClient(
+                host=os.environ.get("CHROMA_HOST"),
+                port=int(os.environ.get("CHROMA_PORT", "8001")),
+            ),
+        )
+        print(f"[store] persisted to ChromaDB at {os.environ.get('CHROMA_HOST')}:{os.environ.get('CHROMA_PORT')}")
+    else:
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+
+        try:
+            client = chromadb.PersistentClient(path=str(CHROMA_DIR))
+            existing = [c.name for c in client.list_collections()]
+            if COLLECTION_NAME in existing:
+                client.delete_collection(COLLECTION_NAME)
+                print(f"[build] deleted existing collection '{COLLECTION_NAME}'")
+        except Exception as e:
+            print(f"[build] could not delete existing collection (may not exist): {e}")
+
+        vectorstore = Chroma.from_documents(
+            documents=chunks,
+            embedding=embeddings,
+            collection_name=COLLECTION_NAME,
+            persist_directory=str(CHROMA_DIR),
+        )
+        print(f"[store] persisted to {CHROMA_DIR.resolve()}")
+
 
     stored = vectorstore._collection.count()
-    print(f"[store] persisted to {CHROMA_DIR.resolve()}")
+    
     print(f"[verify] incoming: {incoming}  stored: {stored}")
     if stored != incoming:
         print(f"[verify] WARNING: {incoming - stored} chunks were dropped")

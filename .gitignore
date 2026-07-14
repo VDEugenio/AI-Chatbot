@@ -11,3 +11,9 @@ test_results.txt
 
 # Eval run results (keep baseline.json if you want to commit it)
 tests/results/run_*.json
+
+# Local notes / future improvement ideas
+future_improvements.md
+
+# SQLite visitor database (runtime data, not source)
+Backend/data/

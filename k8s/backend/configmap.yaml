@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: rag-local
+data:
+  CHROMA_MODE: "http"
+  CHROMA_HOST: "chroma-service"
+  CHROMA_PORT: "8000"
+  COLLECTION_NAME: "vaughn_personal_docs"
+  EMBEDDING_MODEL: "text-embedding-3-small"
+  CLAUDE_MODEL: "claude-sonnet-4-6"
+  ENABLE_BM25: "false"
+  LOG_LEVEL: "DEBUG"

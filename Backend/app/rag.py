@@ -16,6 +16,8 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 
+import chromadb
+
 from .config import Settings
 from .schemas import Message, SourceChunk
 
@@ -33,16 +35,21 @@ SYSTEM_PROMPT = (
     "Be warm, enthusiastic, and conversational — you're representing someone you "
     "genuinely believe in. Keep answers concise but human; avoid sounding like a "
     "database readout.\n\n"
-    "Vaughn's career goal is to land a role in Solutions Engineering, Solutions "
-    "Architecture, Technical Consulting, or a similar position at the intersection "
-    "of engineering and people. He thrives in roles where he gets to translate "
-    "complex technical concepts for non-technical stakeholders, build relationships, "
-    "and help clients or teams succeed. If anyone asks whether Vaughn would be a "
+    "Vaughn's career goal is to land a customer-facing technical role — Solutions "
+    "Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account "
+    "Management, Customer Reliability Engineering, or similar post-sales and "
+    "customer-success engineering positions. What ties these together: he wants to "
+    "be the person who sits at the intersection of technical depth and customer "
+    "relationships, helping clients adopt, succeed with, and get real value from "
+    "technology. He thrives in roles where he gets to translate complex technical "
+    "concepts for non-technical stakeholders, build lasting relationships, and solve "
+    "real problems alongside customers. If anyone asks whether Vaughn would be a "
     "good fit for those types of roles, answer with genuine enthusiasm — draw on "
     "his experience bridging technical and business contexts, his communication "
-    "skills, and his track record of working across teams. Make it clear that "
-    "Vaughn doesn't just write code in a corner — he loves talking to people and "
-    "is at his best when engineering meets human connection.\n\n"
+    "skills, and his track record of working directly with end users and "
+    "stakeholders. Make it clear that Vaughn doesn't just write code in a corner "
+    "— he loves talking to people and is at his best when engineering meets human "
+    "connection.\n\n"
     "Follow these guidelines:\n\n"
     "1. Base your answers on the context provided in each message. You may draw "
     "reasonable conclusions from that context (e.g. inferring a soft skill from a "
@@ -99,11 +106,22 @@ def load_vectorstore(settings: Settings) -> Chroma:
 
     embeddings = OpenAIEmbeddings(model=settings.embedding_model)
 
-    vectorstore = Chroma(
-        collection_name=settings.collection_name,
-        embedding_function=embeddings,
-        persist_directory=settings.chroma_dir,
-    )
+    if settings.chroma_mode == "http":
+        vectorstore = Chroma(
+            collection_name=settings.collection_name,
+            embedding_function=embeddings,
+            client=chromadb.HttpClient(
+                host=settings.chroma_host,
+                port=settings.chroma_port,
+            ),
+        )
+    else:
+        vectorstore = Chroma(
+            collection_name=settings.collection_name,
+            embedding_function=embeddings,
+            persist_directory=settings.chroma_dir,
+        )
+    
     logger.info(
         "Opened Chroma collection '%s' at %s",
         settings.collection_name,

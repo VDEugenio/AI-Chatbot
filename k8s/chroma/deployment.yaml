@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chroma
+  namespace: rag-local
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chroma
+  template:
+    metadata:
+      labels:
+        app: chroma
+    spec:
+      containers:
+        - name: chroma
+          image: chromadb/chroma:latest
+          ports:
+            - containerPort: 8000
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /chroma/chroma
+      volumes:
+        - name: chroma-storage
+          persistentVolumeClaim:
+            claimName: chroma-pvc
