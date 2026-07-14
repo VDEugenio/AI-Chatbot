@@ -177,10 +177,13 @@ EXPANSION_GROUPS: list[tuple[set[str], str]] = [
         {"system", "systems"},
         "architecture infrastructure platform service",
     ),
+    # NOTE: deliberately narrow. Words like "work(ed)", "where", "experience",
+    # and "role" appear incidentally in most natural questions ("experience
+    # with Airflow?", "a project where you made trade-offs") and expanding on
+    # them drowned the query's actual subject in employer terms, biasing
+    # retrieval toward career files on nearly every request.
     (
-        {"work", "worked", "working", "employer", "employment",
-         "company", "companies", "where", "experience", "career", "history",
-         "role", "roles", "position"},
+        {"employer", "employment", "company", "companies", "career", "history"},
         "DraftKings SRC Inc software engineer daily fantasy sports defense contractor TrackSync COMET",
     ),
     # Company-specific triggers — boost exact entity recall in BM25

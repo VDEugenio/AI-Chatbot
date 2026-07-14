@@ -72,6 +72,7 @@ PORTFOLIO_REPOS: list[str] = [
     "VDEugenio/Job-Application-Tracker",
     "VDEugenio/VaughnKey",
     "VDEugenio/adf-marketplace",
+    "VDEugenio/outreach-extension",
 ]
 
 

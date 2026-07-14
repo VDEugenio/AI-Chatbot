@@ -1,8 +1,8 @@
 ---
-name: VaughnKey Technical Deep Dive — Power Budget, Capacitive Touch, BLE vs WiFi
-description: Quantitative power-budget analysis (~10µA sleep, peak currents, theoretical vs observed battery life), why capacitive touch through the peephole beat every alternative, and why BLE was the right choice over WiFi on power/range/security/complexity grounds.
+name: VaughnKey Technical Deep Dive — Power Optimization, Capacitive Touch, BLE vs WiFi
+description: The power-optimization story (one of Vaughn's most technically challenging optimizations — ~10µA deep sleep, quantitative power budget, months of battery life), why capacitive touch through the peephole beat every alternative, and why BLE was the right choice over WiFi on power/range/security/complexity grounds.
 company: personal
-topics: [iot, embedded_systems, ble, low_power, hardware_design, firmware, power_budget, capacitive_touch, protocol_comparison]
+topics: [iot, embedded_systems, ble, low_power, hardware_design, firmware, power_optimization, power_budget, capacitive_touch, protocol_comparison]
 skills: [ESP32, C++, BLE, embedded_programming, power_analysis, rssi, protocol_design]
 story_types: [problem_solving, systems_thinking, architecture_design]
 related_files: [smartlock_hardware.md, smartlock_software.md]
@@ -10,7 +10,13 @@ related_files: [smartlock_hardware.md, smartlock_software.md]
 
 ## Technical Deep Dive: Why This Works
 
-### Power Budget Analysis
+### Power Optimization — Budget Analysis
+
+The most technically challenging optimization in VaughnKey was power: making a
+battery-powered device with a power-hungry servo and BLE radio last for months
+on a single charge. The solution was a deep-sleep-first architecture where the
+system is optimized to spend essentially all of its life asleep, waking only on
+touch — driving idle consumption down to ~10µA.
 
 **Deep sleep current draw:** ~10µA
 **Active BLE scan (1 second):** ~100mA

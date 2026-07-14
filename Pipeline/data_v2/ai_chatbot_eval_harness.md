@@ -5,7 +5,7 @@ company: personal
 topics: [ai_ml, chatbot, testing, ci_cd, eval_harness]
 skills: [test_automation, ci_cd, rag_evaluation, quality_assurance]
 story_types: [product_pitch, problem_solving, technical_depth]
-related_files: [ai_chatbot_project.md, chatbot_overview.md]
+related_files: [chatbot_overview.md, projects_index.md]
 ---
 
 # AI Chatbot Eval & Test Harness

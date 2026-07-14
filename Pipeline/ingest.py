@@ -9,9 +9,13 @@ Markdown files may include YAML frontmatter (company, topics, skills, etc.).
 Those fields are parsed and stored as ChromaDB metadata on every chunk from
 the file, enabling metadata-filtered retrieval in the backend.
 
-Run as a standalone script:
-    python ingest.py            # append to existing collection
-    python ingest.py --rebuild  # wipe and rebuild from scratch
+Underscore-prefixed files (e.g. _meta.md, the human-maintained index) are
+skipped — they document the corpus and must not become corpus content.
+
+Run as a standalone script. Both modes fully rebuild the named collection
+(the existing collection is always deleted before re-embedding):
+    python ingest.py            # rebuild the collection in place
+    python ingest.py --rebuild  # additionally wipe the whole ./chroma_db dir
 """
 
 import argparse
@@ -78,10 +82,13 @@ def parse_frontmatter(path: Path) -> dict:
     scalar metadata values suitable for ChromaDB storage.
 
     Fields extracted:
-      doc_name   — human-readable document title
-      company    — employer or "none" for personal projects
-      topics     — comma-separated topic tags
-      skills     — comma-separated skill tags
+      doc_name    — human-readable document title
+      description — one-line summary of the document's contents
+      company     — employer or "none" for personal projects
+      source      — provenance marker (e.g. "github_dag" for DAG-generated files)
+      repo_url    — GitHub repository URL for project files
+      topics      — comma-separated topic tags
+      skills      — comma-separated skill tags
       story_types — comma-separated story-type tags
 
     Returns an empty dict for non-markdown files or files without frontmatter.
@@ -94,8 +101,14 @@ def parse_frontmatter(path: Path) -> dict:
         result = {}
         if meta.get("name"):
             result["doc_name"] = str(meta["name"])
+        if meta.get("description"):
+            result["description"] = str(meta["description"])
         if meta.get("company"):
             result["company"] = str(meta["company"])
+        if meta.get("source"):
+            result["source"] = str(meta["source"])
+        if meta.get("repo_url"):
+            result["repo_url"] = str(meta["repo_url"])
         if meta.get("topics"):
             result["topics"] = _list_to_meta_str(meta["topics"])
         if meta.get("skills"):
@@ -131,6 +144,12 @@ def load_documents(data_dir: Path) -> list:
 
     docs = []
     for path in files:
+        # Underscore-prefixed files (e.g. _meta.md) are human-facing indexes
+        # that describe the corpus — ingesting them would pollute retrieval.
+        if path.name.startswith("_"):
+            print(f"[skip] {path.name} (underscore-prefixed index file)")
+            continue
+
         ext = path.suffix.lower()
         if ext not in SUPPORTED_EXTENSIONS:
             print(f"[skip] {path.name} (unsupported extension {ext})")
@@ -314,7 +333,8 @@ def export_metadata(chunks: list, path: Path) -> None:
             "preview": text[:120].replace("\n", " "),
         }
         # Include frontmatter fields if present.
-        for key in ("doc_name", "company", "topics", "skills", "story_types"):
+        for key in ("doc_name", "description", "company", "source", "repo_url",
+                    "topics", "skills", "story_types"):
             if key in chunk.metadata:
                 record[key] = chunk.metadata[key]
         records.append(record)

@@ -1,6 +1,6 @@
 ---
-name: AI Resume Chatbot — Engineering Challenges and Key Decisions
-description: The two hardest problems Vaughn solved (retrieval quality and chunking strategy), why he chose RAG over fine-tuning, hybrid BM25+vector over vector-only, and Claude over other LLMs.
+name: AI Resume Chatbot — Engineering Challenges, Decisions, and Trade-offs
+description: The two hardest problems Vaughn solved (retrieval quality and chunking strategy) and the difficult technical trade-offs he weighed - RAG over fine-tuning, hybrid BM25+vector over vector-only, and Claude over other LLMs.
 company: personal
 topics: [engineering_decisions, problem_solving, rag, retrieval, technical_tradeoffs, ai_ml]
 skills: [rag_architecture, technical_judgment, system_design, problem_analysis]
@@ -8,7 +8,9 @@ story_types: [problem_solving, technical_depth, architecture_design, engineering
 related_files: [chatbot_rag_pipeline.md, chatbot_overview.md, chatbot_lessons_status.md]
 ---
 
-# Engineering Challenges and Key Decisions
+# Engineering Challenges, Decisions, and Trade-offs
+
+Building the chatbot meant making difficult technical trade-offs with real consequences: RAG vs fine-tuning, hybrid BM25+vector search vs vector-only, and Claude vs GPT — each weighed deliberately rather than defaulted.
 
 ## Hardest Problem 1: Retrieval Quality
 
@@ -32,13 +34,13 @@ The combination of all three brought retrieval from unreliable to consistent.
 
 ## Hardest Problem 2: Chunking Strategy
 
-The original chunking used a fixed 500-character limit — a common default in RAG tutorials. It produced 137 small chunks that each lacked context.
+The original chunking used a fixed 500-character limit — a common default in RAG tutorials. It shredded the corpus into small chunks that each lacked context.
 
 The core issue: resume content isn't structured like a FAQ. It's narrative. A STAR story — situation, task, action, result — needs to be read as a unit. When the "Early Start Bug" incident story was split into 5 fragments across five chunk boundaries, each fragment independently looked like the right result for different queries, but none contained the full story. The LLM would get fragment #3 of 5 and give an incomplete answer.
 
 **The realization:** the chunking problem isn't really about chunk size — it's about respecting the semantic structure of the source documents. The markdown files are already organized into sections (`## Major Section`, `### Sub-section`). The splitter should respect those boundaries, not cut through them.
 
-**The fix:** switched to header-aware recursive splitting with a 1800-character limit. The splitter tries `\n## ` splits first, then `\n### `, then paragraphs, then lines. An entire `## ` section stays together as one chunk whenever it fits. This brought the chunk count from 137 to 99 — fewer, richer chunks that each contain a complete thought.
+**The fix:** switched to header-aware recursive splitting with a 1800-character limit. The splitter tries `\n## ` splits first, then `\n### `, then paragraphs, then lines. An entire `## ` section stays together as one chunk whenever it fits. At the time of the redesign, this cut the corpus from 137 fragments to 99 richer chunks that each contain a complete thought (the corpus has grown since, but the strategy stands).
 
 ## Key Decision: RAG vs Fine-Tuning
 

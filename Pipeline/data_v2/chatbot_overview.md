@@ -18,7 +18,7 @@ Vaughn built a personal website centered around an AI-powered chatbot that acts 
 
 The site has two main parts:
 - **The chatbot** — a RAG-powered AI assistant that answers questions about Vaughn's experience in natural language
-- **The portfolio** — a structured sidebar/drawer showing his work experience timeline, personal projects (VaughnKey, this chatbot itself), skills and tech stack, and contact/social links
+- **The portfolio** — a structured sidebar/drawer showing his work experience timeline, personal projects (see `projects_index.md` for the full list), skills and tech stack, and contact/social links
 
 ## The Dual Motivation
 
@@ -38,7 +38,7 @@ The project forced Vaughn to confront real RAG problems — not toy examples —
 
 Most "AI chatbot" projects are thin wrappers around an LLM API. This project is different because:
 
-1. **The knowledge base is structured deliberately** — 29 topic-scoped markdown files with YAML metadata, not a raw PDF dump. Each file covers a specific aspect of Vaughn's experience (a role, a project, an architectural decision, an engineering challenge) with enough depth to answer detailed follow-up questions.
+1. **The knowledge base is structured deliberately** — a growing corpus of ~40 topic-scoped markdown files with YAML metadata, not a raw PDF dump. Each file covers a specific aspect of Vaughn's experience (a role, a project, an architectural decision, an engineering challenge) with enough depth to answer detailed follow-up questions.
 
 2. **Retrieval is a solved problem, not an afterthought** — The system uses hybrid search (dense vector + BM25 keyword retrieval fused via Reciprocal Rank Fusion), query expansion, and company-level metadata pre-filtering. These aren't random features — each one addresses a specific retrieval failure mode Vaughn observed.
 
@@ -48,4 +48,4 @@ Most "AI chatbot" projects are thin wrappers around an LLM API. This project is 
 
 ## Current Status
 
-The project is actively developed and will be live on a custom domain by the time recruiters encounter it. The chatbot knowledge base, retrieval pipeline, and frontend portfolio are all built and functional.
+The project is live in production at https://vaughneugenio.com and actively developed. The chatbot knowledge base, retrieval pipeline, and frontend portfolio are all built and functional.

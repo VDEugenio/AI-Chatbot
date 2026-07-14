@@ -95,9 +95,9 @@
     "topic": "projects",
     "expected_keywords": ["BLE", "WiFi", "RAG", "fine-tuning", "BM25", "vector"],
     "min_keywords_required": 2,
-    "expected_sources": ["chatbot_challenges_decisions.md", "smartlock_dev_and_challenges.md"],
+    "expected_sources": ["chatbot_challenges_decisions.md", "smartlock_dev_and_challenges.md", "smartlock_technical_deepdive.md", "smartlock_lessons_future_status.md"],
     "min_sources_required": 1,
-    "notes": "Chatbot: RAG vs fine-tune, BM25+vector vs vector-only. SmartLock: WiFi→BLE, servo selection, touch detection approach"
+    "notes": "Chatbot: RAG vs fine-tune, BM25+vector vs vector-only. SmartLock: WiFi→BLE (told in dev_and_challenges, technical_deepdive, AND lessons files), servo selection, touch detection approach. Sources broadened 2026-07: multiple files legitimately answer this"
   },
   {
     "id": "Q12",
@@ -218,5 +218,25 @@
     "expected_sources": ["profile_overview.md", "src_cop_is_king.md"],
     "min_sources_required": 1,
     "notes": "Exact UI chip — should make a positive case referencing customer-facing work, SE narrative from SRC, and collaborative pattern across roles"
+  },
+  {
+    "id": "Q24",
+    "question": "Does Vaughn have any experience with Airflow?",
+    "topic": "technical",
+    "expected_keywords": ["DAG", "GitHub", "ingest", "pipeline", "Astronomer"],
+    "min_keywords_required": 2,
+    "expected_sources": ["skills_evidence.md", "github_VDEugenio_AI_Chatbot.md"],
+    "min_sources_required": 1,
+    "notes": "Known failure (2026-07): bot answered 'no' despite the AI Chatbot project using two Airflow DAGs. Keywords chosen to only match a positive answer (a 'no' answer would still echo the word Airflow). skills_evidence.md is the planned Phase 1 fix; github_VDEugenio_AI_Chatbot.md is the only current source mentioning Airflow"
+  },
+  {
+    "id": "Q25",
+    "question": "What personal projects has Vaughn worked on?",
+    "topic": "projects",
+    "expected_keywords": ["VaughnKey", "chatbot", "tracker", "marketplace", "outreach"],
+    "min_keywords_required": 5,
+    "expected_sources": ["projects_index.md", "job_tracker_overview.md", "github_VDEugenio_adf_marketplace.md"],
+    "min_sources_required": 1,
+    "notes": "Known failure (2026-07): bot listed only VaughnKey and the chatbot, missing job tracker and adf-marketplace. Requires full enumeration of all four projects. projects_index.md is the planned Phase 1 canonical list; adf-marketplace currently only exists as a company:github file"
   }
 ]
