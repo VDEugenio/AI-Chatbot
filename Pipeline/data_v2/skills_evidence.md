@@ -35,6 +35,9 @@ Two production integrations: the chatbot's answer generation (system prompts eng
 ### OpenAI Embeddings
 text-embedding-3-small powers the chatbot's dense retrieval; Vaughn handles embedding-model/collection consistency between the ingestion pipeline and the backend.
 
+### Performance & Power Optimization
+Three flagship optimization stories across different domains: at SRC, trie-based ID validation and a parallelized translation pipeline pushing TrackSync to ~350K tracks/min; at DraftKings, Redis player-card caching and database query optimization for 500k+ peak users; and in VaughnKey, the power optimization — a deep-sleep-first architecture drawing ~10µA idle so a battery-powered device with a servo and BLE radio lasts 3–4 months per charge.
+
 ## Orchestration & Data Pipelines
 
 ### Apache Airflow

@@ -1,6 +1,6 @@
 ---
-name: AI Resume Chatbot — Engineering Challenges and Key Decisions
-description: The two hardest problems Vaughn solved (retrieval quality and chunking strategy), why he chose RAG over fine-tuning, hybrid BM25+vector over vector-only, and Claude over other LLMs.
+name: AI Resume Chatbot — Engineering Challenges, Decisions, and Trade-offs
+description: The two hardest problems Vaughn solved (retrieval quality and chunking strategy) and the difficult technical trade-offs he weighed - RAG over fine-tuning, hybrid BM25+vector over vector-only, and Claude over other LLMs.
 company: personal
 topics: [engineering_decisions, problem_solving, rag, retrieval, technical_tradeoffs, ai_ml]
 skills: [rag_architecture, technical_judgment, system_design, problem_analysis]
@@ -8,7 +8,9 @@ story_types: [problem_solving, technical_depth, architecture_design, engineering
 related_files: [chatbot_rag_pipeline.md, chatbot_overview.md, chatbot_lessons_status.md]
 ---
 
-# Engineering Challenges and Key Decisions
+# Engineering Challenges, Decisions, and Trade-offs
+
+Building the chatbot meant making difficult technical trade-offs with real consequences: RAG vs fine-tuning, hybrid BM25+vector search vs vector-only, and Claude vs GPT — each weighed deliberately rather than defaulted.
 
 ## Hardest Problem 1: Retrieval Quality
 

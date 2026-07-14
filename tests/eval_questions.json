@@ -95,9 +95,9 @@
     "topic": "projects",
     "expected_keywords": ["BLE", "WiFi", "RAG", "fine-tuning", "BM25", "vector"],
     "min_keywords_required": 2,
-    "expected_sources": ["chatbot_challenges_decisions.md", "smartlock_dev_and_challenges.md"],
+    "expected_sources": ["chatbot_challenges_decisions.md", "smartlock_dev_and_challenges.md", "smartlock_technical_deepdive.md", "smartlock_lessons_future_status.md"],
     "min_sources_required": 1,
-    "notes": "Chatbot: RAG vs fine-tune, BM25+vector vs vector-only. SmartLock: WiFi→BLE, servo selection, touch detection approach"
+    "notes": "Chatbot: RAG vs fine-tune, BM25+vector vs vector-only. SmartLock: WiFi→BLE (told in dev_and_challenges, technical_deepdive, AND lessons files), servo selection, touch detection approach. Sources broadened 2026-07: multiple files legitimately answer this"
   },
   {
     "id": "Q12",

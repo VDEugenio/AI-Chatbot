@@ -10,7 +10,7 @@ related_files: [chatbot_overview.md, smartlock_overview.md, job_tracker_overview
 
 # Personal Projects — Complete Index
 
-Vaughn has built **five personal projects**, all with public GitHub repositories. This is the complete list; each has dedicated files with full detail.
+Vaughn has built **five personal projects**, all with public GitHub repositories: **1) the AI Resume Chatbot** (production RAG system, github.com/VDEugenio/AI-Chatbot), **2) VaughnKey** (ESP32 retrofit smart lock, github.com/VDEugenio/VaughnKey), **3) the Job Application Tracker** (Gmail + Claude email classification, github.com/VDEugenio/Job-Application-Tracker), **4) the Outreach Extension** (LinkedIn outreach Chrome extension with tracking links, github.com/VDEugenio/outreach-extension), and **5) the ADF Marketplace** ("Hugging Face for Rawl agents", github.com/VDEugenio/adf-marketplace). This is the complete list; details for each below, and each has dedicated files with full depth.
 
 ### 1. AI Resume Chatbot & Portfolio Website
 **Repo:** https://github.com/VDEugenio/AI-Chatbot · **Live:** https://vaughneugenio.com
