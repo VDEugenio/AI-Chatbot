@@ -73,7 +73,3 @@ See [SETUP.md](SETUP.md) for full step-by-step instructions. In short:
 - SETUP.md
 - backend/
 - frontend/
-
-## Developer Notes
-
-The Job Application Tracker currently runs as a local application with plans for future deployment improvements. While the Claude AI classification accuracy performed well overall, the developer optimized for efficiency by switching to Claude Haiku to reduce token usage costs while maintaining classification quality. The project is designed for local use at this stage, though there are plans to migrate the processing pipeline to an Airflow DAG hosted on Astro for better scalability and automation in future iterations.
