@@ -20,6 +20,11 @@ from pathlib import Path
 
 import requests
 
+# Force UTF-8 stdout on Windows (cp1252 can't encode the box-drawing chars
+# used in the report) — same approach as Pipeline/ingest.py.
+if sys.stdout.encoding and sys.stdout.encoding.lower() not in ("utf-8", "utf8"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 SCRIPT_DIR = Path(__file__).parent
 QUESTIONS_FILE = SCRIPT_DIR / "eval_questions.json"
 RESULTS_DIR = SCRIPT_DIR / "results"

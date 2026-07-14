@@ -1,0 +1,855 @@
+{
+  "run_at": "2026-07-14T16:55:49",
+  "api_url": "https://chat.vaughneugenio.com",
+  "summary": {
+    "passed": 19,
+    "total": 24,
+    "errors": 0,
+    "accuracy": 0.7917,
+    "avg_response_ms": 10770,
+    "by_topic": {
+      "efficiency": {
+        "passed": 3,
+        "total": 4
+      },
+      "technical": {
+        "passed": 4,
+        "total": 5
+      },
+      "projects": {
+        "passed": 2,
+        "total": 4
+      },
+      "collaboration": {
+        "passed": 3,
+        "total": 3
+      },
+      "career": {
+        "passed": 2,
+        "total": 3
+      },
+      "ui_chip": {
+        "passed": 5,
+        "total": 5
+      }
+    }
+  },
+  "questions": [
+    {
+      "id": "Q01",
+      "question": "Tell me about a time you improved system performance or efficiency",
+      "topic": "efficiency",
+      "passed": true,
+      "error": null,
+      "response_ms": 10834,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "tracks",
+          "trie",
+          "optimized"
+        ],
+        "missing": [
+          "350K",
+          "parallelized"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "src_tracksync_optimizations.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 1
+      },
+      "answer_preview": "Oh, this is a great question for Vaughn \u2014 he's got a few really compelling stories here depending on the technical context you're most interested in!\n\n---\n\n**At DraftKings**, Vaughn tackled performanc"
+    },
+    {
+      "id": "Q02",
+      "question": "How do you handle production incidents under pressure?",
+      "topic": "efficiency",
+      "passed": true,
+      "error": null,
+      "response_ms": 11411,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "mitigation",
+          "incident",
+          "on-call",
+          "root cause"
+        ],
+        "missing": [],
+        "required": 2,
+        "total": 4
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_incident_response.md",
+          "draftkings_practices_collaboration.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 and this is actually one of Vaughn's strongest areas. He's got a real-world example that shows exactly how he operates under pressure.\n\nAt DraftKings, Vaughn participated in a regular"
+    },
+    {
+      "id": "Q03",
+      "question": "What's the most technically challenging optimization you've worked on?",
+      "topic": "efficiency",
+      "passed": false,
+      "error": null,
+      "response_ms": 10861,
+      "timeout": false,
+      "keyword_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "deep sleep",
+          "power",
+          "battery",
+          "ESP32"
+        ],
+        "required": 2,
+        "total": 4
+      },
+      "source_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "smartlock_dev_and_challenges.md",
+          "smartlock_technical_deepdive.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 there are a few strong contenders, but one that really stands out is a performance optimization Vaughn did at **SRC Inc.** on a system called **TrackSync**.\n\nTrackSync was middleware "
+    },
+    {
+      "id": "Q04",
+      "question": "How did you scale a system to handle high traffic?",
+      "topic": "efficiency",
+      "passed": true,
+      "error": null,
+      "response_ms": 10288,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "Redis",
+          "Kubernetes",
+          "caching"
+        ],
+        "missing": [
+          "500k"
+        ],
+        "required": 2,
+        "total": 4
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_performance_scale.md",
+          "draftkings_role_and_stack.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 and Vaughn has a really concrete answer for this from his time at DraftKings!\n\nThe platform served **500,000+ daily active users**, and traffic wasn't steady \u2014 it swung dramatically b"
+    },
+    {
+      "id": "Q05",
+      "question": "What distributed systems technologies have you worked with?",
+      "topic": "technical",
+      "passed": true,
+      "error": null,
+      "response_ms": 8721,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "Orleans",
+          "RabbitMQ",
+          "Redis",
+          "Kubernetes",
+          "microservices"
+        ],
+        "missing": [],
+        "required": 3,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_role_and_stack.md",
+          "draftkings_architecture.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question! Vaughn has some solid distributed systems experience, particularly from his time at **DraftKings**.\n\nThere, he worked on a platform serving **500,000+ peak daily active users** across "
+    },
+    {
+      "id": "Q06",
+      "question": "Describe your experience with embedded systems or IoT",
+      "topic": "technical",
+      "passed": true,
+      "error": null,
+      "response_ms": 11500,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "ESP32",
+          "BLE",
+          "firmware",
+          "servo",
+          "capacitive"
+        ],
+        "missing": [],
+        "required": 3,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "smartlock_overview.md",
+          "smartlock_hardware.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Oh, this is a fun one \u2014 Vaughn built a fully functional smart lock from scratch called **VaughnKey**, and it's a great window into his embedded systems chops.\n\nThe project started from a real constrai"
+    },
+    {
+      "id": "Q07",
+      "question": "What AI or machine learning technologies have you used?",
+      "topic": "technical",
+      "passed": true,
+      "error": null,
+      "response_ms": 9279,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "Claude",
+          "RAG",
+          "ChromaDB",
+          "embeddings"
+        ],
+        "missing": [
+          "Haiku",
+          "LLM"
+        ],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "chatbot_overview.md"
+        ],
+        "missing": [
+          "job_tracker_overview.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question! Vaughn has hands-on experience with AI/ML across both professional and personal projects:\n\n**On the professional side**, during his internship at Marsh McLennan (May\u2013August 2021), he a"
+    },
+    {
+      "id": "Q08",
+      "question": "What programming languages and frameworks are you strongest in?",
+      "topic": "technical",
+      "passed": true,
+      "error": null,
+      "response_ms": 8293,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "C#",
+          "Java",
+          "Python",
+          "React",
+          ".NET",
+          "Spring Boot"
+        ],
+        "missing": [
+          "FastAPI"
+        ],
+        "required": 3,
+        "total": 7
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "technical_skills.md",
+          "draftkings_role_and_stack.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question! Vaughn's strongest technical foundation is in **backend development**, with his deepest experience in:\n\n**Languages:**\n- **C#** \u2014 his primary language at DraftKings, where he built and"
+    },
+    {
+      "id": "Q09",
+      "question": "Tell me about your most impressive personal project",
+      "topic": "projects",
+      "passed": true,
+      "error": null,
+      "response_ms": 13827,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "VaughnKey",
+          "ESP32",
+          "chatbot",
+          "RAG"
+        ],
+        "missing": [
+          "smartlock"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "smartlock_overview.md",
+          "chatbot_overview.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Oh, this is a fun one to talk about \u2014 Vaughn has two personal projects that are both genuinely impressive in different ways, and they show off very different sides of him.\n\n---\n\n**VaughnKey \u2014 Retrofit"
+    },
+    {
+      "id": "Q11",
+      "question": "Describe a project where you had to make difficult technical trade-offs",
+      "topic": "projects",
+      "passed": false,
+      "error": null,
+      "response_ms": 11297,
+      "timeout": false,
+      "keyword_check": {
+        "passed": false,
+        "found": [
+          "BLE"
+        ],
+        "missing": [
+          "WiFi",
+          "RAG",
+          "fine-tuning",
+          "BM25",
+          "vector"
+        ],
+        "required": 2,
+        "total": 6
+      },
+      "source_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "chatbot_challenges_decisions.md",
+          "smartlock_dev_and_challenges.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 the Shohei Ohtani dual-role player project at DraftKings is a perfect example of this.\n\nThe challenge: Ohtani is unique in baseball \u2014 he plays as both a pitcher *and* a hitter. DraftK"
+    },
+    {
+      "id": "Q12",
+      "question": "Tell me about the job tracker you built",
+      "topic": "projects",
+      "passed": true,
+      "error": null,
+      "response_ms": 12264,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "Gmail",
+          "OAuth",
+          "Haiku",
+          "email",
+          "classification",
+          "SQLite"
+        ],
+        "missing": [],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "job_tracker_overview.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 1
+      },
+      "answer_preview": "Oh, this one's a great story \u2014 it's a perfect example of Vaughn seeing a real problem and just... solving it, fast.\n\n## The Job Application Tracker\n\nDuring his active job search, Vaughn was juggling a"
+    },
+    {
+      "id": "Q13",
+      "question": "Tell me about a time you worked with non-technical stakeholders",
+      "topic": "collaboration",
+      "passed": true,
+      "error": null,
+      "response_ms": 10304,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "COP",
+          "stakeholder",
+          "customer"
+        ],
+        "missing": [
+          "Solutions Engineering",
+          "alignment"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "src_customer_engagement_onboarding.md"
+        ],
+        "missing": [
+          "src_cop_is_king.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Oh, this is a great question for Vaughn \u2014 he has some really compelling stories here!\n\nOne that stands out is from his time at **SRC Inc.**, where he worked on **TrackSync**, a real-time military trac"
+    },
+    {
+      "id": "Q14",
+      "question": "Describe a cross-functional project you led or contributed to",
+      "topic": "collaboration",
+      "passed": true,
+      "error": null,
+      "response_ms": 12884,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "Ohtani",
+          "product",
+          "pitcher",
+          "hitter"
+        ],
+        "missing": [
+          "cross-functional",
+          "data team"
+        ],
+        "required": 2,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_ohtani_project.md",
+          "draftkings_practices_collaboration.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 Vaughn has a few really compelling examples of this!\n\n**The Ohtani Dual-Role Project at DraftKings** is probably the most vivid one. When Shohei Ohtani started playing as both a pitch"
+    },
+    {
+      "id": "Q15",
+      "question": "How do you explain technical concepts to non-engineers?",
+      "topic": "collaboration",
+      "passed": true,
+      "error": null,
+      "response_ms": 11458,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "demo",
+          "customer",
+          "sprint",
+          "presentation"
+        ],
+        "missing": [
+          "onboarding"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "src_customer_engagement_onboarding.md",
+          "src_cop_is_king.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 and honestly, this is one of Vaughn's real strengths.\n\nThe clearest example is something called **\"COP is King\"** \u2014 a decision framework he developed at SRC. The problem was that Trac"
+    },
+    {
+      "id": "Q16",
+      "question": "Why are you interested in Solutions Engineering roles?",
+      "topic": "career",
+      "passed": false,
+      "error": null,
+      "response_ms": 9687,
+      "timeout": false,
+      "keyword_check": {
+        "passed": false,
+        "found": [
+          "technical liaison"
+        ],
+        "missing": [
+          "customer",
+          "collaboration",
+          "cross-functional"
+        ],
+        "required": 2,
+        "total": 4
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "profile_overview.md"
+        ],
+        "missing": [
+          "src_cop_is_king.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question \u2014 and honestly, it's something Vaughn has thought a lot about, because it's not just a career pivot, it's a recognition of where he's *always* been most energized.\n\nLooking back across "
+    },
+    {
+      "id": "Q17",
+      "question": "What's your experience working in defense or government contracts?",
+      "topic": "career",
+      "passed": true,
+      "error": null,
+      "response_ms": 9916,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "SRC",
+          "TAK",
+          "COP",
+          "military",
+          "defense"
+        ],
+        "missing": [
+          "Secret clearance"
+        ],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "src_role_overview.md",
+          "src_tracksync_architecture.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Great question! Vaughn has some really interesting experience here.\n\nHe spent about **19 months at SRC Inc.**, a defense contractor, working as a Software Engineer from **October 2023 to May 2025** ou"
+    },
+    {
+      "id": "Q18",
+      "question": "Tell me about your time at DraftKings",
+      "topic": "career",
+      "passed": true,
+      "error": null,
+      "response_ms": 10070,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "DraftKings",
+          "DFS",
+          "daily fantasy",
+          "C#"
+        ],
+        "missing": [
+          "Orleans",
+          "500k"
+        ],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_role_and_stack.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 1
+      },
+      "answer_preview": "Oh, DraftKings is a great story to tell! Vaughn spent **9 months there (May 2025 \u2013 February 2026)** as a **Software Engineer** on the DFS (Daily Fantasy Sports) Backend Engineering team \u2014 a small but "
+    },
+    {
+      "id": "Q19",
+      "question": "What is Vaughn's professional background?",
+      "topic": "ui_chip",
+      "passed": true,
+      "error": null,
+      "response_ms": 14576,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "distributed systems",
+          "Solutions Engineering",
+          "DraftKings",
+          "SRC"
+        ],
+        "missing": [],
+        "required": 2,
+        "total": 4
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "profile_overview.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 1
+      },
+      "answer_preview": "Great question to start with! Here's a snapshot of who Vaughn is:\n\nVaughn is a software engineer with **3+ years of experience** building distributed systems at scale \u2014 but what really sets him apart "
+    },
+    {
+      "id": "Q20",
+      "question": "What did Vaughn work on at DraftKings?",
+      "topic": "ui_chip",
+      "passed": true,
+      "error": null,
+      "response_ms": 11358,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "C#",
+          "Orleans",
+          "DFS",
+          "microservices",
+          "RabbitMQ"
+        ],
+        "missing": [
+          "500k"
+        ],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "draftkings_role_and_stack.md",
+          "draftkings_architecture.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Vaughn spent 9 months at DraftKings (May 2025 \u2013 February 2026) as a Software Engineer on the DFS (Daily Fantasy Sports) Backend Engineering team \u2014 a small, tight-knit group of 5 engineers. He was laid"
+    },
+    {
+      "id": "Q21",
+      "question": "Tell me about Vaughn's experience at SRC Inc.",
+      "topic": "ui_chip",
+      "passed": true,
+      "error": null,
+      "response_ms": 14397,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "TrackSync",
+          "TAK",
+          "COP"
+        ],
+        "missing": [
+          "Java",
+          "Spring Boot",
+          "Secret clearance"
+        ],
+        "required": 3,
+        "total": 6
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "src_role_overview.md",
+          "src_tracksync_architecture.md"
+        ],
+        "missing": [],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Vaughn spent about 19 months at **SRC Inc.**, a defense contractor based in North Charleston, SC, working as a Software Engineer from **October 2023 to May 2025**. It's a really compelling chapter of "
+    },
+    {
+      "id": "Q22",
+      "question": "What are some of Vaughn's personal projects?",
+      "topic": "ui_chip",
+      "passed": true,
+      "error": null,
+      "response_ms": 9795,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "VaughnKey",
+          "chatbot",
+          "RAG"
+        ],
+        "missing": [
+          "smartlock",
+          "job tracker"
+        ],
+        "required": 3,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "smartlock_overview.md",
+          "chatbot_overview.md"
+        ],
+        "missing": [
+          "job_tracker_overview.md"
+        ],
+        "required": 2,
+        "total": 3
+      },
+      "answer_preview": "Vaughn has two really cool personal projects that showcase both his hardware chops and his software/AI skills:\n\n---\n\n**\ud83d\udd10 VaughnKey \u2014 Retrofit Smart Lock**\n([GitHub](https://github.com/VDEugenio/Vaughn"
+    },
+    {
+      "id": "Q23",
+      "question": "Would Vaughn be a good fit for a Solutions Engineering role?",
+      "topic": "ui_chip",
+      "passed": true,
+      "error": null,
+      "response_ms": 11706,
+      "timeout": false,
+      "keyword_check": {
+        "passed": true,
+        "found": [
+          "customer",
+          "cross-functional",
+          "stakeholder"
+        ],
+        "missing": [
+          "technical liaison",
+          "collaboration"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": true,
+        "found": [
+          "profile_overview.md"
+        ],
+        "missing": [
+          "src_cop_is_king.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "Absolutely \u2014 and I'd say that with genuine enthusiasm, not just because it's my job to represent him well.\n\nVaughn isn't a \"code in a corner\" engineer. He's consistently been the person who *wants* to"
+    },
+    {
+      "id": "Q24",
+      "question": "Does Vaughn have any experience with Airflow?",
+      "topic": "technical",
+      "passed": false,
+      "error": null,
+      "response_ms": 4032,
+      "timeout": false,
+      "keyword_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "DAG",
+          "GitHub",
+          "ingest",
+          "pipeline",
+          "Astronomer"
+        ],
+        "required": 2,
+        "total": 5
+      },
+      "source_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "skills_evidence.md",
+          "github_VDEugenio_AI_Chatbot.md"
+        ],
+        "required": 1,
+        "total": 2
+      },
+      "answer_preview": "That's a great question, but Airflow isn't something that comes up in the background information I have on Vaughn. It's possible he has some familiarity with it that just isn't captured here!\n\nYour be"
+    },
+    {
+      "id": "Q25",
+      "question": "What personal projects has Vaughn worked on?",
+      "topic": "projects",
+      "passed": false,
+      "error": null,
+      "response_ms": 9741,
+      "timeout": false,
+      "keyword_check": {
+        "passed": false,
+        "found": [
+          "VaughnKey",
+          "chatbot"
+        ],
+        "missing": [
+          "tracker",
+          "marketplace"
+        ],
+        "required": 4,
+        "total": 4
+      },
+      "source_check": {
+        "passed": false,
+        "found": [],
+        "missing": [
+          "projects_index.md",
+          "job_tracker_overview.md",
+          "github_VDEugenio_adf_marketplace.md"
+        ],
+        "required": 1,
+        "total": 3
+      },
+      "answer_preview": "Vaughn has two really cool personal projects that showcase both his technical range and his product-thinking mindset:\n\n---\n\n### \ud83d\udd10 VaughnKey \u2014 Retrofit Smart Lock\n**GitHub:** https://github.com/VDEugen"
+    }
+  ]
+}
