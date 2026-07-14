@@ -5,7 +5,8 @@ context_asker.py
 Helpers for the ask_for_context task in github_ingest_dag.
 
 Public functions:
-    generate_questions(repos, api_key)      -> str
+    fetch_existing_files(token, repo_name)  -> dict[str, str]
+    generate_questions(repos, api_key, existing_files=None) -> str
     parse_questions_to_list(raw_text)       -> list[dict]
     post_run_to_backend(run_id, repos_questions, formatted_files, backend_url) -> None
     send_telegram(message, bot_token, chat_id) -> None
@@ -75,6 +76,11 @@ def generate_questions(repos: list[dict], api_key: str, existing_files: dict | N
         file_structure.
     api_key:
         Anthropic API key.
+    existing_files:
+        Optional dict mapping filename to content for github_*.md files already
+        in Pipeline/data_v2/. When provided, the prompt is extended with a
+        second section so Claude avoids re-asking questions whose answers are
+        already present in the enriched docs.
 
     Returns
     -------
@@ -184,8 +190,8 @@ def post_run_to_backend(
     repos_questions:
         Output of parse_questions_to_list() — list of repo/question dicts.
     formatted_files:
-        The list of {filename, content} dicts loaded from the format_markdown
-        temp file.
+        The list of {filename, content} dicts returned by format_markdown via
+        XCom.
     backend_url:
         Base URL of the RAG backend (e.g. https://chat.vaughneugenio.com).
 
