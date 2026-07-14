@@ -2,7 +2,7 @@
 name: Vaughn Eugenio Profile Overview
 description: High-level professional profile, contact info, career focus, and synthesized strengths across all roles.
 company: none
-topics: [career_transition, solutions_engineering, cross_functional, customer_facing]
+topics: [career_transition, solutions_engineering, sales_engineering, forward_deployed_engineering, customer_success, cross_functional, customer_facing]
 skills: [stakeholder_communication, technical_liaison, problem_solving, systems_thinking]
 story_types: [cross_functional, stakeholder_communication, customer_collaboration]
 related_files: [technical_skills.md]
@@ -12,7 +12,7 @@ related_files: [technical_skills.md]
 
 ## Current Status
 
-**Vaughn is currently unemployed and actively job searching** (as of April 2026). He was laid off from DraftKings in February 2026 as part of a company-wide reduction in force — his departure was not performance-related. He is not currently employed and is actively seeking his next role in Solutions Engineering, Solutions Architecture, Technical Consulting, or a similar customer-facing technical position.
+**Vaughn is currently unemployed and actively job searching** (as of April 2026). He was laid off from DraftKings in February 2026 as part of a company-wide reduction in force — his departure was not performance-related. He is not currently employed and is actively seeking his next role in Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or a similar customer-facing technical position.
 
 ---
 
@@ -28,7 +28,7 @@ related_files: [technical_skills.md]
 ---
 
 ## Overview
-Vaughn is a software engineer with 3+ years of experience building distributed systems at scale, now transitioning into Solutions Engineering, Solutions Architect, Sales Engineer, Technical Consultant, and similar customer-facing technical roles. Throughout his career, he has consistently gravitated toward cross-functional and stakeholder-facing work, serving as a technical liaison between engineering teams and non-technical audiences. He does his best work at the intersection of engineering and people, and is looking for a human-facing role that still utilizes his knowledge, experience, and passion for tech.
+Vaughn is a software engineer with 3+ years of experience building distributed systems at scale, now transitioning into customer-facing technical roles — Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, and similar positions. Throughout his career, he has consistently gravitated toward cross-functional and stakeholder-facing work, serving as a technical liaison between engineering teams and non-technical audiences. He does his best work at the intersection of engineering and people, and is looking for a role that lets him help customers adopt, succeed with, and get real value from technology.
 
 ## Contact Information
 - **Email:** vaughndde@gmail.com
@@ -39,7 +39,7 @@ Vaughn is a software engineer with 3+ years of experience building distributed s
 ## Personal Context
 
 - **Location:** North Charleston, SC (family in Hilton Head, SC)
-- **Career Focus:** Transitioning from traditional software engineering into Solutions Engineering, Solutions Architect, Sales Engineer, Technical Consultant, or similar customer-facing technical roles
+- **Career Focus:** Transitioning from traditional software engineering into Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or similar customer-facing technical roles
 - **Career Motivation:** Looking for a human-facing role that still utilizes technical knowledge, experience, and passion for technology
 
 ---
@@ -76,7 +76,7 @@ From building debugging tools for call center representatives to improving usabi
 
 ## What Vaughn is Looking For
 
-Vaughn is seeking opportunities in Solutions Engineering, Solutions Architect, Sales Engineer, Technical Consultant, or similar customer-facing technical roles where he can:
+Vaughn is seeking opportunities in Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or similar customer-facing technical roles where he can:
 
 - Work directly with customers to understand their technical needs and challenges
 - Translate complex technical concepts for non-technical audiences
