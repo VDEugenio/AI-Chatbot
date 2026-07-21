@@ -43,6 +43,48 @@ def _truncate(s: str, n: int) -> str:
     return s[: n - 1].rstrip() + "…"
 
 
+# Substrings (lowercased) that mark a User-Agent as an automated fetcher.
+# Checked only after the LinkedIn-specific check, so "bot" here is safe.
+_BOT_UA_PATTERNS = (
+    "slackbot",
+    "twitterbot",
+    "facebookexternalhit",
+    "whatsapp",
+    "telegrambot",
+    "discordbot",
+    "skypeuripreview",
+    "googlebot",
+    "bingbot",
+    "bot",
+    "crawler",
+    "spider",
+    "apache-httpclient",
+    "python-requests",
+    "curl",
+    "wget",
+    "headlesschrome",
+)
+
+
+def classify_user_agent(ua: str | None) -> str:
+    """
+    Classify a User-Agent string as 'linkedin', 'bot', or 'human'.
+
+    LinkedIn's crawler fetches tracking links whenever either party opens the
+    chat (link preview + safety scan), so it gets its own category — a
+    LinkedInBot hit means "chat opened", not "link clicked". A missing UA is
+    treated as a bot: real browsers always send one.
+    """
+    if not ua or not ua.strip():
+        return "bot"
+    lowered = ua.lower()
+    if "linkedinbot" in lowered:
+        return "linkedin"
+    if any(pattern in lowered for pattern in _BOT_UA_PATTERNS):
+        return "bot"
+    return "human"
+
+
 class TelegramNotifier:
     """Async Telegram client wrapper. One instance per app process."""
 
@@ -185,19 +227,50 @@ class TelegramNotifier:
         ip: str,
         user_agent: str | None = None,
     ) -> None:
-        """Ping when someone follows a tracking link (/r/{slug})."""
+        """
+        Ping when a tracking link (/r/{slug}) is fetched.
+
+        The message shape depends on who fetched it:
+          linkedin — LinkedInBot preview/safety fetch → "Chat opened". No geo
+                     line: those IPs are LinkedIn/Cloudflare infrastructure,
+                     so any location would be the bot's, not the person's.
+          bot      — other crawler/preview fetcher → "Bot fetch", with geo
+                     kept (labeled as the bot's) to help identify unknowns.
+          human    — real browser → the classic "Tracking link opened".
+        """
         if not self._enabled:
             return
-        geo = await asyncio.to_thread(geoip_lookup, ip)
         name = slug.replace("-", " ").title()
+        kind = classify_user_agent(user_agent)
         ua_line = f"\n🧭 {_esc(_truncate(user_agent, 120))}" if user_agent else ""
-        text = (
-            f"🔗 <b>Tracking link opened</b>\n\n"
-            f"👤 {_esc(name)}\n"
-            f"📍 {_esc(geo.label)}\n"
-            f"🌐 IP: <code>{_esc(ip)}</code>"
-            f"{ua_line}"
-        )
+
+        if kind == "linkedin":
+            text = (
+                f"💬 <b>Chat opened (LinkedIn)</b>\n\n"
+                f"👤 {_esc(name)}\n"
+                f"🌐 IP: <code>{_esc(ip)}</code>"
+                f"{ua_line}"
+            )
+            await self._send(text)
+            return
+
+        geo = await asyncio.to_thread(geoip_lookup, ip)
+        if kind == "bot":
+            text = (
+                f"🤖 <b>Bot fetch</b>\n\n"
+                f"👤 {_esc(name)}\n"
+                f"📍 {_esc(geo.label)} (bot's location)\n"
+                f"🌐 IP: <code>{_esc(ip)}</code>"
+                f"{ua_line}"
+            )
+        else:
+            text = (
+                f"🔗 <b>Tracking link opened</b>\n\n"
+                f"👤 {_esc(name)}\n"
+                f"📍 {_esc(geo.label)}\n"
+                f"🌐 IP: <code>{_esc(ip)}</code>"
+                f"{ua_line}"
+            )
         await self._send(text)
 
     async def notify_intake(
