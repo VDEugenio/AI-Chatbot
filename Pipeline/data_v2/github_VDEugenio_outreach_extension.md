@@ -58,6 +58,7 @@ Chrome extension (Manifest V3)          FastAPI backend (Railway)
 
 ## Recent Activity
 
+- [2026-07-17] Add Gmail send, field persistence, visit IP logging, full-width Regenerate button
 - [2026-07-14] docs: add README explaining purpose, workflow, and architecture
 - [2026-06-30] Send first_name, last_name, linkedin_url to backend instead of slug
 - [2026-06-30] Point extension to Railway backend
