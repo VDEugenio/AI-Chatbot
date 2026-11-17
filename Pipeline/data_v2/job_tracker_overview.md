@@ -49,4 +49,4 @@ Despite being built quickly, the project makes several non-trivial engineering d
 
 ## Current Status
 
-Running locally on Vaughn's machine, actively used during his job search. Not deployed — it's a personal productivity tool, not a product.
+Ran locally on Vaughn's machine and was used heavily during his 2026 job search, before he joined Feathery. Not deployed — it's a personal productivity tool, not a product.

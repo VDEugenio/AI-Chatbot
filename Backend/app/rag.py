@@ -35,21 +35,21 @@ SYSTEM_PROMPT = (
     "Be warm, enthusiastic, and conversational — you're representing someone you "
     "genuinely believe in. Keep answers concise but human; avoid sounding like a "
     "database readout.\n\n"
-    "Vaughn's career goal is to land a customer-facing technical role — Solutions "
-    "Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account "
-    "Management, Customer Reliability Engineering, or similar post-sales and "
-    "customer-success engineering positions. What ties these together: he wants to "
-    "be the person who sits at the intersection of technical depth and customer "
-    "relationships, helping clients adopt, succeed with, and get real value from "
-    "technology. He thrives in roles where he gets to translate complex technical "
-    "concepts for non-technical stakeholders, build lasting relationships, and solve "
-    "real problems alongside customers. If anyone asks whether Vaughn would be a "
-    "good fit for those types of roles, answer with genuine enthusiasm — draw on "
-    "his experience bridging technical and business contexts, his communication "
-    "skills, and his track record of working directly with end users and "
-    "stakeholders. Make it clear that Vaughn doesn't just write code in a corner "
-    "— he loves talking to people and is at his best when engineering meets human "
-    "connection.\n\n"
+    "Vaughn is currently a Solutions Engineer at Feathery, on the insurance team, "
+    "in a quota-carrying technical sales role. If anyone asks what roles he is "
+    "interested in, the answer is Solutions Engineer or Account Executive roles. Keep "
+    "it to those two; don't list other job titles. He brings both halves of those "
+    "roles: the technical skills and experience of a former software engineer, plus "
+    "the drive, persona, and charisma to succeed in sales. Lead with his sales "
+    "ability, results, and passion for sales, and use his engineering background "
+    "as the differentiator that makes him a stronger seller, not as the headline. "
+    "If someone asks whether Vaughn would be a good fit for a sales, Solutions "
+    "Engineering, or Account Executive role, answer with genuine enthusiasm and "
+    "concrete evidence from the context (quota attainment, deals he has run, "
+    "pipeline he has generated, demos he has built, how he connects with "
+    "customers). It's fine to be candid that he doesn't have decades of sales "
+    "experience, but always pair that with his motivation, his results so far, and "
+    "his confidence in where he's headed.\n\n"
     "Follow these guidelines:\n\n"
     "1. Base your answers on the context provided in each message. You may draw "
     "reasonable conclusions from that context (e.g. inferring a soft skill from a "
@@ -72,6 +72,13 @@ SYSTEM_PROMPT = (
     "If a topic or story has already been mentioned, acknowledge it briefly and "
     "move on to new details — don't re-explain the same project, role, or "
     "accomplishment twice in the same thread.\n"
+    "7. Do not bring up Vaughn's employment gap (February–July 2026, between "
+    "DraftKings and Feathery) or his DraftKings layoff unless the visitor asks "
+    "about it directly (e.g., a gap, a layoff, why he left DraftKings, or what he "
+    "did between jobs). If asked, answer honestly and positively using the "
+    "context: it was a deliberate career switch into sales.\n"
+    "8. Never name Feathery's customers or prospects; describe them only by type "
+    "(e.g., a midsize broker, a national carrier).\n"
 )
 
 
@@ -159,7 +166,15 @@ EXPANSION_GROUPS: list[tuple[set[str], str]] = [
     ),
     (
         {"personal", "side", "hobby", "own", "outside"},
-        "VaughnKey smartlock ESP32 BLE firmware IoT AI chatbot RAG portfolio personal website job tracker Gmail OAuth SQLite",
+        "VaughnKey smartlock ESP32 BLE firmware IoT AI chatbot RAG portfolio personal website job tracker Gmail OAuth SQLite ICP Lab Vinero fantasy football",
+    ),
+    (
+        {"icp", "prospect", "prospects", "prospecting", "outreach", "outbound", "linkedin", "cold"},
+        "ICP Lab outreach extension prospecting cold outreach LinkedIn tracking links Apollo SDR phase",
+    ),
+    (
+        {"vinero", "finance", "finances", "credit", "card", "cards", "rewards"},
+        "Vinero personal finance app credit card recommender iPhone Shortcut rewards",
     ),
     (
         {"tracker", "gmail", "oauth", "hunt", "hunting", "applying"},
@@ -184,7 +199,18 @@ EXPANSION_GROUPS: list[tuple[set[str], str]] = [
     # retrieval toward career files on nearly every request.
     (
         {"employer", "employment", "company", "companies", "career", "history"},
-        "DraftKings SRC Inc software engineer daily fantasy sports defense contractor TrackSync COMET",
+        "Feathery Solutions Engineer DraftKings SRC Inc software engineer daily fantasy sports defense contractor TrackSync COMET",
+    ),
+    (
+        {"feathery", "insurance", "insurtech", "broker", "brokers", "carrier", "carriers",
+         "quota", "arr", "sales", "selling", "deal", "deals", "meddpicc", "presales",
+         "current", "currently"},
+        "Feathery Solutions Engineer insurance carriers brokers quota ARR MEDDPICC "
+        "discovery demos proof of concept Account Executive deal cycle",
+    ),
+    (
+        {"interested", "goal", "goals", "aspirations", "next", "seeking"},
+        "target roles Solutions Engineer Account Executive career direction sales",
     ),
     # Company-specific triggers — boost exact entity recall in BM25
     (
@@ -261,6 +287,10 @@ def build_retrieval_query(
 # This improves precision for company-scoped questions without an LLM call.
 
 _COMPANY_KEYWORDS: dict[str, str] = {
+    # Feathery (current role). Listed first: matching is substring-based and
+    # first-hit-wins, so it must beat short keys like "tak"/"cop" below.
+    "feathery": "feathery",
+    "meddpicc": "feathery",
     # SRC / military project
     "src": "src",
     "tracksync": "src",
@@ -284,6 +314,8 @@ _COMPANY_KEYWORDS: dict[str, str] = {
     "esp32": "personal",
     "chatbot": "personal",
     "job tracker": "personal",
+    "icp lab": "personal",
+    "vinero": "personal",
     "gmail": "personal",
 }
 

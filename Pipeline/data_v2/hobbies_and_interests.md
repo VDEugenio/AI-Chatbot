@@ -1,6 +1,6 @@
 ---
 name: Hobbies and Interests
-description: Vaughn's personal interests outside of software — Brazilian Jiu-Jitsu, golf, and cooking.
+description: Vaughn's personal interests outside of work — Brazilian Jiu-Jitsu, golf, cooking, and fantasy football.
 company: none
 topics: [personal_interests, discipline, competition, culture]
 skills: []
@@ -17,3 +17,6 @@ Vaughn has been golfing on and off since childhood and plays regularly in Hilton
 
 ### Cooking
 Vaughn began taking cooking seriously in 2019 as a college freshman missing his mom's cooking. He started cooking for his dorm neighbors and learned through trial and plenty of error. He enjoys learning different cuisines and authentic foods and techniques, using them as interchangeable building blocks in other dishes. Given his heritage, he particularly loves classic Italian cooking including pizza, bread, and pasta from scratch.
+
+### Fantasy Football
+Vaughn is in **six fantasy football leagues** this year. To keep up with all of them, he built himself an AI fantasy football advisor. It manages his teams in one place, lets him consult an AI agent with up-to-date and historical data, and alerts him if he needs to swap a lineup before kickoff. He built it for himself and his dad, and each of them has an account.

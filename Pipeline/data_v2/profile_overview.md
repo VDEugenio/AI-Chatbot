@@ -1,18 +1,20 @@
 ---
 name: Vaughn Eugenio Profile Overview
-description: High-level professional profile, contact info, career focus, and synthesized strengths across all roles.
+description: High-level professional profile — current role as a quota-carrying Solutions Engineer at Feathery, roles he's interested in (Solutions Engineer or Account Executive), employment history, contact info, strengths, and personal projects.
 company: none
-topics: [career_transition, solutions_engineering, sales_engineering, forward_deployed_engineering, customer_success, cross_functional, customer_facing]
-skills: [stakeholder_communication, technical_liaison, problem_solving, systems_thinking]
-story_types: [cross_functional, stakeholder_communication, customer_collaboration]
-related_files: [technical_skills.md]
+topics: [current_role, career_direction, target_roles, sales, solutions_engineering, account_executive, career_transition, customer_facing]
+skills: [solutions_engineering, sales, discovery, demos, stakeholder_communication, technical_translation, problem_solving]
+story_types: [profile, career_narrative, stakeholder_communication]
+related_files: [feathery_role_overview.md, sales_journey_and_mentorship.md, technical_skills.md, projects_index.md]
 ---
 
 # Vaughn Eugenio - Professional Context
 
 ## Current Status
 
-**Vaughn is currently unemployed and actively job searching** (as of April 2026). He was laid off from DraftKings in February 2026 as part of a company-wide reduction in force — his departure was not performance-related. He is not currently employed and is actively seeking his next role in Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or a similar customer-facing technical position.
+**Vaughn is currently a Solutions Engineer at Feathery** (since July 2026). Feathery is a Series A–funded startup building an AI operating and decisioning system for financial services. Vaughn is on the **insurance** team, selling to **carriers and brokers**, in a **quota-carrying** role, and he is **on pace for ~140% of a $750K ARR quota**. He works remotely from North Charleston, SC. See feathery_role_overview.md for full details.
+
+**Roles he's interested in: Solutions Engineer or Account Executive.** He has the technical skills and experience of a former software engineer, plus the drive, persona, and charisma to succeed in sales.
 
 ---
 
@@ -20,46 +22,54 @@ related_files: [technical_skills.md]
 
 | Company | Role | Duration | Status |
 |---------|------|----------|--------|
-| DraftKings | Software Engineer | May 2025 – Feb 2026 | Ended — laid off (RIF) |
+| Feathery | Solutions Engineer (Insurance) | Jul 2026 – Present | **Current role** |
+| DraftKings | Software Engineer | May 2025 – Feb 2026 | Ended — company-wide reduction in force |
 | SRC Inc. | Software Engineer | Oct 2023 – May 2025 | Ended — left for DraftKings |
 | Swampfox Technologies | Software Engineer Intern | Summer 2022 | Internship — completed |
 | Marsh McLennan | Data Analytics Intern | Summer 2021 | Internship — completed |
 
+Career path: after earning his B.S. in Computer Science at the University of South Carolina, Vaughn worked as a software engineer at **SRC**, then at **DraftKings**, and then moved into technical sales at **Feathery**.
+
 ---
 
 ## Overview
-Vaughn is a software engineer with 3+ years of experience building distributed systems at scale, now transitioning into customer-facing technical roles — Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, and similar positions. Throughout his career, he has consistently gravitated toward cross-functional and stakeholder-facing work, serving as a technical liaison between engineering teams and non-technical audiences. He does his best work at the intersection of engineering and people, and is looking for a role that lets him help customers adopt, succeed with, and get real value from technology.
+
+Vaughn is a **technical seller**: a Solutions Engineer who started out as a software engineer. At Feathery he owns the pre-sales motion for insurance prospects: discovery, custom demos, and proofs of concept. He also supports implementation and post-sale success, sources his own pipeline at industry conferences, and has run deals end-to-end as the Account Executive.
+
+Before Feathery, he spent 3+ years as a software engineer building distributed systems at scale (500k+ daily users at DraftKings; 350,000 tracks per minute on military systems at SRC). Even then he kept gravitating toward customer-facing work: demos, on-site visits, translating technical work for leadership, and pitching solutions across teams. Moving into sales put that at the center of his career, and in a short time he has proven to himself and to Feathery that sales is where he is most effective.
+
+His engineering background is his edge in sales. He can go deep with a customer's technical team, build the integration himself, and then explain the same thing in plain business terms to an executive.
 
 ## Contact Information
 - **Email:** vaughndde@gmail.com
 - **Phone:** 732-501-8621
 - **LinkedIn:** [linkedin.com/in/vaughn-d-eugenio](https://www.linkedin.com/in/vaughn-d-eugenio)
-- **Location:** North Charleston, SC
+- **Location:** North Charleston, SC (remote; travels for conferences and customer onsites)
 
 ## Personal Context
 
 - **Location:** North Charleston, SC (family in Hilton Head, SC)
-- **Career Focus:** Transitioning from traditional software engineering into Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or similar customer-facing technical roles
-- **Career Motivation:** Looking for a human-facing role that still utilizes technical knowledge, experience, and passion for technology
+- **Career focus:** Technical sales, as a Solutions Engineer or Account Executive
+- **Sales roots:** His dad has been in sales successfully for 40+ years and is one of his biggest mentors (see sales_journey_and_mentorship.md)
 
 ---
 
 ## Professional Strengths
 
-### Cross-Functional Collaboration
-Throughout his career, Vaughn has consistently served as a bridge between technical and non-technical teams. At SRC, he was the primary technical liaison for TrackSync, partnering with engineering, subcontractors, designers, and program leadership. At Swampfox, he translated feature progress into business terms for stakeholders. At DraftKings, he led cross-functional efforts to resolve complex edge cases affecting user experience.
+### Connecting with people and making technology simple
+Vaughn's biggest strength is building real rapport with prospects and explaining technical solutions so simply that the value is obvious, whether he's talking to the C-suite, salespeople, or a customer's technical team. He relates, understands the problem, acknowledges it, and then shows how the solution creates value for that person.
 
-### Stakeholder Communication
-Vaughn excels at gathering requirements, defining specifications, and communicating progress to both technical and non-technical audiences. He has experience presenting to program leadership, translating technical concepts for business stakeholders, and ensuring alignment across product and engineering teams.
+### Disciplined sales process
+He runs discovery and qualification on **MEDDPICC**, manages 4–8 month enterprise insurance sales cycles, and focuses on being competent, hard-working, reliable, and easy to work with at every stage.
 
-### Problem-Solving at Scale
-Vaughn has built and maintained systems processing 350,000 tracks per minute and serving 500k+ daily users. He understands the complexities of distributed systems, real-time data processing, and high-availability architectures.
+### Pipeline generation and drive
+He has the highest meetings-booked-per-conference rate among Feathery's SEs (about 7 meetings from a good conference). During his career switch he sent 2,000+ cold outreach messages across LinkedIn, email, and phone, and built his own AI prospecting tool (ICP Lab) to do it better.
 
-### Technical Breadth
-With experience across backend development, cloud infrastructure, event-driven architecture, frontend development, and data processing, Vaughn brings a comprehensive technical toolkit that allows him to understand and contribute across the full stack.
+### Technical depth
+He writes code, builds API integrations and connections to AMS platforms and CRMs, and builds custom demos from scratch in under a week. All of it rests on years of backend, cloud, and distributed-systems engineering.
 
-### Customer-Centric Thinking
-From building debugging tools for call center representatives to improving usability for operational military users to identifying edge cases affecting DraftKings customers, Vaughn consistently focuses on the end-user experience and impact.
+### Customer ownership
+From saving an at-risk Feathery account after a platform regression, to supporting 5+ accounts worth several hundred thousand dollars each through implementation, to on-call incident response at DraftKings, Vaughn takes ownership of the customer's outcome.
 
 ---
 
@@ -68,22 +78,16 @@ From building debugging tools for call center representatives to improving usabi
 | Project | Description | GitHub |
 |---------|-------------|--------|
 | AI Resume Chatbot | RAG-powered chatbot on personal portfolio website — acts as an interactive resume | https://github.com/VDEugenio/AI-Chatbot |
+| ICP Lab | AI prospecting and outreach-analytics tool: paste a job description, get the people most likely to respond ranked by predicted engagement from his own outreach history, with one-click personalized messages and tracking links | https://github.com/VDEugenio/icp-lab |
+| Outreach Extension | Version 1 of ICP Lab — Chrome extension that personalizes LinkedIn outreach via Apollo.io and embeds unique tracking links with Telegram notifications | https://github.com/VDEugenio/outreach-extension |
+| Vinero | Custom personal finance app with a one-tap iPhone button that detects the store he's at and recommends which credit card maximizes rewards | Private repository |
+| Fantasy Football Dashboard | AI fantasy football advisor he built for himself and his dad to manage multiple leagues and get lineup-swap alerts before kickoff | Private repository |
 | VaughnKey | Battery-powered retrofit smart lock using ESP32, capacitive touch, and BLE | https://github.com/VDEugenio/VaughnKey |
 | Job Application Tracker | Full-stack app that connects to Gmail via OAuth, uses Claude AI to auto-classify job emails, and displays everything in a React dashboard — built in a few hours to replace a manual spreadsheet | https://github.com/VDEugenio/Job-Application-Tracker |
 | ADF Marketplace | Marketplace for uploading, browsing, and downloading Rawl-agent .adf files — deployed at adf-marketplace.vercel.app | https://github.com/VDEugenio/adf-marketplace |
-| Outreach Extension | Chrome extension for LinkedIn job-search outreach — detects the profile being viewed, enriches contact info via the Apollo.io API, and generates a personalized connection message with a unique tracking link (FastAPI + PostgreSQL backend on Railway; link clicks notify Vaughn via Telegram) | https://github.com/VDEugenio/outreach-extension |
 
 ---
 
-## What Vaughn is Looking For
+## Career Direction
 
-Vaughn is seeking opportunities in Solutions Engineering, Sales Engineering, Forward Deployed Engineering, Technical Account Management, Customer Reliability Engineering, or similar customer-facing technical roles where he can:
-
-- Work directly with customers to understand their technical needs and challenges
-- Translate complex technical concepts for non-technical audiences
-- Design and architect solutions that solve real business problems
-- Serve as a bridge between engineering, product, and customer success teams
-- Leverage his technical foundation while focusing on human interaction and relationship building
-- Apply his passion for technology in a more collaborative, externally-facing capacity
-
-He thrives at the intersection of engineering and people, and is looking to make that the center of his career.
+Vaughn is interested in **Solutions Engineer** and **Account Executive** roles. He doesn't have decades of sales experience, and he's open about that. But he is highly motivated to perfect the craft every day, always willing to learn and always willing to mentor, and confident in his current skill set and in where he's headed: a long-term career in technical sales.

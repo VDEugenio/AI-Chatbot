@@ -1,13 +1,18 @@
 ---
 name: Technical Skills Inventory
-description: Full inventory of languages, frameworks, infrastructure, data, frontend, and tooling skills across Vaughn's career.
+description: Full inventory of sales tools, languages, frameworks, infrastructure, data, frontend, and tooling skills across Vaughn's career.
 company: none
 topics: [languages, backend, cloud_devops, data_messaging, frontend, monitoring, ai_ml, orchestration]
-skills: [csharp, java, python, javascript, typescript, dotnet, orleans, spring_boot, rest_apis, event_driven, microservices, aws, kubernetes, kind, kubectl, helm, docker, podman, rancher, bamboo, airflow, sql, tsql, mysql, snowflake, redis, rabbitmq, react, mui, datadog, git, jira, rag, langchain, chromadb, bm25, hybrid_search, openai_embeddings, claude_api, prompt_engineering, llm_evals]
+skills: [hubspot, apollo, meddpicc, mcp, plaid, claude_code, csharp, java, python, javascript, typescript, dotnet, orleans, spring_boot, rest_apis, event_driven, microservices, aws, kubernetes, kind, kubectl, helm, docker, podman, rancher, bamboo, airflow, sql, tsql, mysql, snowflake, redis, rabbitmq, react, mui, datadog, git, jira, rag, langchain, chromadb, bm25, hybrid_search, openai_embeddings, claude_api, prompt_engineering, llm_evals]
 story_types: []
 ---
 
 ## Technical Skills
+
+### Sales Tools & Methodology
+- HubSpot (CRM)
+- Apollo.io (prospecting and enrichment)
+- MEDDPICC (discovery and qualification)
 
 ### Languages
 - C#
@@ -32,6 +37,8 @@ story_types: []
 - Claude API (Anthropic)
 - Prompt engineering
 - LLM eval harnesses
+- MCP (Model Context Protocol) servers
+- Claude Code (AI-assisted development)
 
 ### Cloud & DevOps
 - AWS
@@ -54,8 +61,11 @@ story_types: []
 ### Frontend
 - React
 - Material-UI (MUI)
+- TypeScript / Vite
+- Chrome extensions (Manifest V3)
 
 ### Monitoring & Tooling
 - Datadog
 - Git
 - Jira
+- Plaid, Google Places, Apollo.io, Gmail, and Telegram APIs

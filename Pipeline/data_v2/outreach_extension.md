@@ -15,7 +15,7 @@ related_files: [projects_index.md, chatbot_overview.md]
 
 ## What It Is
 
-A Chrome extension that turns cold LinkedIn outreach from a manual chore into an instrumented funnel. Vaughn built it for his own job search: instead of hand-writing connection messages and never knowing if anyone engaged, the extension generates a personalized message in one click and embeds a unique tracking link — so he knows exactly which recruiters clicked through to his portfolio, and when.
+A Chrome extension that turns cold LinkedIn outreach from a manual chore into an instrumented funnel. Vaughn built it for his own outreach during his career switch into sales: instead of hand-writing connection messages and never knowing if anyone engaged, the extension generates a personalized message in one click and embeds a unique tracking link — so he knows exactly which recruiters clicked through to his portfolio, and when.
 
 ## How It Works
 
@@ -34,3 +34,7 @@ A Chrome extension that turns cold LinkedIn outreach from a manual chore into an
 ## Why It's Interesting
 
 It's a small system with real product thinking: it identifies the actual bottleneck in cold outreach (no feedback signal), solves it with minimal infrastructure, and integrates with Vaughn's existing portfolio ecosystem — the tracking links deliberately route recruiters to the interactive resume chatbot. It also shows pragmatic engineering judgment: collision-checked short IDs, graceful API-failure fallbacks, and a deploy pipeline (Railway) chosen for speed over ceremony.
+
+## What It Became: ICP Lab
+
+The Outreach Extension was **version 1 of ICP Lab** (see icp_lab.md). Once every message was tracked, Vaughn built ICP Lab on top of the same database. It adds funnel analytics, ideal-customer-profile analysis, a Gmail reply scanner, and AI prospecting: paste a job description and it ranks the people most likely to respond, based on his own outreach history. Together they powered his cold-outreach "SDR phase," over 2,000 outreach messages across LinkedIn, email, and phone.
