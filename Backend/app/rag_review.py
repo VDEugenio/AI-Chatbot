@@ -74,7 +74,10 @@ async def synthesize_and_store(run_id: str, answers: list[dict], settings) -> No
             )
             enriched_files.append({
                 "filename": file["filename"],
-                "content": message.content[0].text,
+                # Join text blocks; Sonnet 5.5 responses can start with a thinking block.
+                "content": "".join(
+                    b.text for b in message.content if getattr(b, "type", None) == "text"
+                ),
             })
         else:
             # No answers for this repo — keep baseline unchanged.
