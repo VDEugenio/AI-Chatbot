@@ -238,5 +238,45 @@
     "expected_sources": ["projects_index.md", "job_tracker_overview.md", "github_VDEugenio_adf_marketplace.md"],
     "min_sources_required": 1,
     "notes": "Known failure (2026-07): bot listed only VaughnKey and the chatbot, missing job tracker and adf-marketplace. Requires full enumeration of all four projects. projects_index.md is the planned Phase 1 canonical list; adf-marketplace currently only exists as a company:github file"
+  },
+  {
+    "id": "Q26",
+    "question": "What is Vaughn's current role?",
+    "topic": "career",
+    "expected_keywords": ["Feathery", "Solutions Engineer", "insurance", "quota", "brokers", "carriers"],
+    "min_keywords_required": 3,
+    "expected_sources": ["feathery_role_overview.md", "profile_overview.md"],
+    "min_sources_required": 1,
+    "notes": "Added 2026-11 with the Feathery KB update. Should identify the quota-carrying SE role on Feathery's insurance team; must not say he is unemployed."
+  },
+  {
+    "id": "Q27",
+    "question": "What roles is Vaughn interested in?",
+    "topic": "career",
+    "expected_keywords": ["Solutions Engineer", "Account Executive"],
+    "min_keywords_required": 2,
+    "expected_sources": ["profile_overview.md", "sales_journey_and_mentorship.md"],
+    "min_sources_required": 1,
+    "notes": "Added 2026-11. Answer should be exactly SE or AE; the old SE/FDE/TAM/CRE list is retired (check manually that it doesn't reappear)."
+  },
+  {
+    "id": "Q28",
+    "question": "How does Vaughn approach sales and discovery?",
+    "topic": "sales",
+    "expected_keywords": ["MEDDPICC", "discovery", "demo", "value", "relate", "acknowledge"],
+    "min_keywords_required": 3,
+    "expected_sources": ["feathery_sales_approach.md", "feathery_deal_stories.md"],
+    "min_sources_required": 1,
+    "notes": "Added 2026-11. Should surface MEDDPICC and the relate/understand/acknowledge/value approach."
+  },
+  {
+    "id": "Q29",
+    "question": "Tell me about ICP Lab",
+    "topic": "projects",
+    "expected_keywords": ["job description", "Apollo", "Claude", "tracking", "respond", "outreach"],
+    "min_keywords_required": 3,
+    "expected_sources": ["icp_lab.md"],
+    "min_sources_required": 1,
+    "notes": "Added 2026-11. Should describe JD -> Claude -> Apollo -> ranked by predicted engagement, plus tracking links."
   }
 ]

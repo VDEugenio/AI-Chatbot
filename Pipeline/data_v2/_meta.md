@@ -8,12 +8,19 @@ Topic-scoped RAG corpus for Vaughn Eugenio's professional context. Every file ca
 
 ## Profile
 
-- **profile_overview.md** — Overview, contact info, career focus, employment history, personal projects table, and synthesized professional strengths across all roles. (tags: career_transition, solutions_engineering, cross_functional)
+- **profile_overview.md** — Current status (Solutions Engineer at Feathery), target roles (SE or AE), employment history, contact info, sales-led strengths, personal projects table. (tags: current_role, career_direction, target_roles, sales)
+- **sales_journey_and_mentorship.md** — Why sales, dad's 40+ years in sales as mentorship, career switch + cold-outreach "SDR phase" (2,000+ messages), traits of top sellers mapped to evidence, honest-but-confident growth framing, Feb–Jul 2026 gap (answer only if asked). (tags: career_direction, why_sales, mentorship, cold_outreach)
 - **technical_skills.md** — Full inventory of languages, frameworks, AI/LLM tooling, infrastructure, data/messaging, frontend, and tooling skills. (tags: tech_stack, ai_ml)
 - **education.md** — University of South Carolina B.S. Computer Science credentials and honors. (tags: education)
-- **hobbies_and_interests.md** — Brazilian Jiu-Jitsu, golf, and cooking. (tags: personal_interests)
+- **hobbies_and_interests.md** — Brazilian Jiu-Jitsu, golf, cooking, and fantasy football (6 leagues + AI dashboard built with his dad). (tags: personal_interests)
 - **swampfox_internship.md** — Summer 2022 internship: SFValid debugging tool and automated CCXML/VXML call workflows. (tags: internal_tooling, call_center, agile)
 - **marsh_mclennan_internship.md** — Summer 2021 internship: Python/Pandas data pipelines, K-Means/BIRCH clustering, R→Python migration. (tags: data_pipelines, machine_learning)
+
+## Feathery (Jul 2026 – Present) — current role
+
+- **feathery_role_overview.md** — Company (AI operating system for financial services, Series A led by Portage, ~$30M total), insurance products for carriers/brokers, SE scope (pre-sale heavy + post-sale + BD + acting AE), quota (~140% of $750K ARR), metrics, team, tools. (tags: current_role, sales, insurance, quota)
+- **feathery_sales_approach.md** — MEDDPICC discovery, relate→understand→acknowledge→value communication, strong-impression principles, rapid custom demos, land-and-expand products, technical integrations, AI on both sides. (tags: sales_methodology, meddpicc, demos)
+- **feathery_deal_stories.md** — Anonymized stories: full-cycle AE deals for two midsize brokers from conferences, selling ahead of the roadmap (COI + EB demos), saving an at-risk customer after a platform regression. (tags: deal_stories, full_cycle_sales, customer_retention)
 
 ## DraftKings (May 2025 – Feb 2026)
 
@@ -46,7 +53,7 @@ Topic-scoped RAG corpus for Vaughn Eugenio's professional context. Every file ca
 - **smartlock_lessons_future_status.md** — Five design-philosophy lessons, remaining work and future enhancements, edge cases, current status, and why the project demonstrates engineering competence. (tags: lessons_learned, future_work, engineering_competence)
 - **smartlock_technical_deepdive.md** — Quantitative power-budget analysis, why capacitive touch beat every alternative, and why BLE beat WiFi on power/range/security/complexity. (tags: power_budget, capacitive_touch, protocol_comparison)
 
-## Chatbot & Job Tracker (personal projects)
+## Chatbot, Job Tracker, ICP Lab & Vinero (personal projects)
 
 - **chatbot_overview.md** — Why Vaughn built the chatbot (dual motivation: recruiter tool + RAG learning), what the portfolio site contains, why this project is interesting. (tags: ai_ml, rag, personal_website, product_pitch)
 - **chatbot_architecture.md** — Full system architecture: FastAPI backend, React frontend, ChromaDB, OpenAI embeddings, Claude, Docker, AWS App Runner. (tags: system_architecture, backend, deployment)
@@ -56,7 +63,9 @@ Topic-scoped RAG corpus for Vaughn Eugenio's professional context. Every file ca
 - **ai_chatbot_eval_harness.md** — Automated eval framework: 23-question test set with keyword and source-citation checks, 80% accuracy gate in CI, baseline-comparison mode, pipeline smoke tests. (tags: eval_harness, testing, ci_cd)
 - **job_tracker_overview.md** — Job Application Tracker: Gmail OAuth + Claude Haiku email classification, built in a few hours; replaces manual spreadsheet with an automated React dashboard. (tags: automation, ai_ml, rapid_development, personal_project)
 - **job_tracker_technical.md** — Tech stack (FastAPI, SQLite, Gmail API, Claude Haiku, React), prompt caching, CSRF-safe OAuth, status rank enforcement, deduplication logic, and security decisions. (tags: system_architecture, oauth2, prompt_caching, security)
-- **outreach_extension.md** — Chrome extension for LinkedIn outreach: Apollo.io contact enrichment, templated messages, unique tracking links with Telegram click notifications; FastAPI + PostgreSQL backend on Railway. (tags: chrome_extension, job_search, api_integration, personal_project)
+- **outreach_extension.md** — Chrome extension for LinkedIn outreach (v1 of ICP Lab): Apollo.io contact enrichment, templated messages, unique tracking links with Telegram click notifications; FastAPI + PostgreSQL backend on Railway. (tags: chrome_extension, cold_outreach, api_integration, personal_project)
+- **icp_lab.md** — ICP Lab: JD → Claude → Apollo → people ranked by predicted engagement from his own outreach history; one-click A/B-tested messages with tracking links; funnel + ICP analytics; reply scanner; Work mode for Feathery prospecting; outreach results. (tags: prospecting, sales_tooling, ai_ml, personal_project)
+- **vinero.md** — Vinero personal finance app: one-tap iPhone card recommender (~1.9× a flat 2% card), reimbursement tracking, Plaid, MCP server; built AI-assisted in ~1 month. Private repo. (tags: product_thinking, fintech, personal_project)
 
 ## GitHub-generated (auto-synced by the Airflow DAG)
 
@@ -72,6 +81,6 @@ Topic-scoped RAG corpus for Vaughn Eugenio's professional context. Every file ca
 
 ---
 
-**Total:** 42 files (6 profile + 7 DraftKings + 8 SRC + 7 VaughnKey + 8 chatbot/job tracker + 4 GitHub-generated + 2 aggregation) + this index.
+**Total:** 48 hand-written files (7 profile + 3 Feathery + 7 DraftKings + 8 SRC + 7 VaughnKey + 10 personal-project + 2 aggregation) + GitHub-generated files + this index.
 
 **Originals preserved in:** `Pipeline/data_backup/`.

@@ -110,7 +110,7 @@ Throughout my time at DraftKings, I consistently gravitated toward the customer-
 - **Stakeholder Communication:** Enjoyed translating technical concepts for non-technical partners
 - **User Impact Focus:** Prioritized customer experience (e.g., 25min manual payout resolution)
 
-This experience reinforced my interest in **Solutions Engineering roles** where technical depth meets customer-facing problem-solving.
+This experience reinforced my interest in **technical sales**, where technical depth meets customer-facing problem-solving. After DraftKings, I moved into sales as a Solutions Engineer at Feathery (July 2026).
 
 ---
 
