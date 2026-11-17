@@ -60,11 +60,20 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     claude_model: str = Field(
-        default="claude-sonnet-4-6",
+        default="claude-sonnet-5-5",
         description="Anthropic model id used for chat completions.",
     )
-    max_tokens: int = Field(default=2048, ge=1, le=8192)
-    temperature: float = Field(default=0.2, ge=0.0, le=1.0)
+    # Thinking tokens count toward max_tokens on Sonnet 5.5, so leave headroom
+    # beyond the visible answer length.
+    max_tokens: int = Field(default=4096, ge=1, le=16000)
+    effort: str = Field(
+        default="low",
+        description=(
+            "output_config.effort for chat answers (low|medium|high|xhigh|max). "
+            "'low' keeps time-to-first-token short for grounded Q&A. "
+            "Sampling params (temperature/top_p/top_k) are rejected on Sonnet 5.5."
+        ),
+    )
 
     # --- Retrieval ---
     top_k: int = Field(

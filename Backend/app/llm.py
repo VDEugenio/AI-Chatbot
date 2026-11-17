@@ -35,6 +35,20 @@ _RERANK_CHUNK_CHARS = 600
 _JSON_ARRAY_RE = re.compile(r"\[\s*\{.*?\}\s*\]", re.DOTALL)
 
 
+# Server-side refusal fallback (beta). On a `cyber` or `frontier_llm` decline,
+# the API retries the request on a fallback model it picks ("default").
+# Sent via extra_* because the pinned SDK version doesn't type `fallbacks` yet.
+_FALLBACK_HEADERS = {"anthropic-beta": "server-side-fallback-2026-07-01"}
+_FALLBACK_BODY = {"fallbacks": "default"}
+
+
+def _text_of(response) -> str:
+    """Concatenate text blocks; thinking blocks (possibly empty) are skipped."""
+    return "".join(
+        b.text for b in response.content if getattr(b, "type", None) == "text"
+    )
+
+
 def _cached_system(text: str) -> list[dict]:
     """Wrap a system prompt string in Anthropic's prompt-cache format.
 
@@ -51,7 +65,7 @@ class ClaudeClient:
         self._client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
         self._model = settings.claude_model
         self._max_tokens = settings.max_tokens
-        self._temperature = settings.temperature
+        self._effort = settings.effort
         # Reranker can run on a cheaper/faster model if configured.
         self._rerank_model = settings.rerank_model or settings.claude_model
 
@@ -67,21 +81,25 @@ class ClaudeClient:
             response = await self._client.messages.create(
                 model=self._model,
                 max_tokens=self._max_tokens,
-                temperature=self._temperature,
+                output_config={"effort": self._effort},
                 system=_cached_system(system),
                 messages=messages,
+                extra_headers=_FALLBACK_HEADERS,
+                extra_body=_FALLBACK_BODY,
             )
         except anthropic.APIError as exc:
             logger.exception("Anthropic API error")
             raise LLMError(f"Anthropic API error: {exc}") from exc
 
-        # `content` is a list of typed blocks; concatenate the text blocks.
-        text_parts = [
-            block.text for block in response.content if getattr(block, "type", None) == "text"
-        ]
-        if not text_parts:
+        if response.stop_reason == "refusal":
+            logger.warning("Claude declined the request: %s", response.stop_details)
+            raise LLMError("Claude declined to answer this request.")
+
+        # `content` is a list of typed blocks (thinking + text); keep the text.
+        text = _text_of(response)
+        if not text:
             raise LLMError("Claude returned no text content.")
-        return "".join(text_parts).strip()
+        return text.strip()
 
     async def answer_stream(
         self, system: str, messages: list[dict]
@@ -96,12 +114,18 @@ class ClaudeClient:
             async with self._client.messages.stream(
                 model=self._model,
                 max_tokens=self._max_tokens,
-                temperature=self._temperature,
+                output_config={"effort": self._effort},
                 system=_cached_system(system),
                 messages=messages,
+                extra_headers=_FALLBACK_HEADERS,
+                extra_body=_FALLBACK_BODY,
             ) as stream:
+                # text_stream yields only text deltas, so thinking is skipped.
                 async for text in stream.text_stream:
                     yield text
+                final = await stream.get_final_message()
+                if final.stop_reason == "refusal":
+                    logger.warning("Claude declined the request: %s", final.stop_details)
         except anthropic.APIError as exc:
             logger.exception("Anthropic streaming API error")
             raise LLMError(f"Anthropic API error: {exc}") from exc
@@ -144,18 +168,18 @@ class ClaudeClient:
         try:
             response = await self._client.messages.create(
                 model=self._rerank_model,
-                max_tokens=2048,
-                temperature=0.0,
+                max_tokens=4096,
+                output_config={"effort": "low"},
                 system=_RERANK_SYSTEM,
                 messages=[{"role": "user", "content": user_prompt}],
+                extra_headers=_FALLBACK_HEADERS,
+                extra_body=_FALLBACK_BODY,
             )
         except anthropic.APIError as exc:
             logger.warning("Rerank call failed, keeping input order: %s", exc)
             return [(i, 0.0) for i in range(min(top_k, len(candidates)))]
 
-        text = "".join(
-            b.text for b in response.content if getattr(b, "type", None) == "text"
-        )
+        text = _text_of(response)
 
         # The model is instructed to return ONLY a JSON array, but we
         # tolerate small preambles/suffixes by regex-extracting the first
